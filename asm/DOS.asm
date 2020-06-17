@@ -1955,15 +1955,20 @@ Dloadl1         LD ($2325),SP               ; Transfer SP to HL.
 ; *********************************************************
 
 ; * Error messages printed on the screen
-; * Starts at $FE30
+; * The Message_space starts at $FE30
+
+; * A The text store used has message arranged consecutively
+; * in order of increasing number.
+; * 00 is used to separate message.
+; * Characters with codes > 127 are interpreted as messages
+; * to be inserted recursively.
+
 ; * Calls: None.
 
 ; * Called by: Print
 
-; * Error Message_space
-; * Error no.	Message
+; * Message no.	Text
 ; * 0   $00	(No error) - not included in the list
-Message_space	DB $00
 ; * 1   $01	Check sum error
 ; * 2   $02	Verify error
 ; * 3   $03	Wot no disk?
@@ -1986,6 +1991,103 @@ Message_space	DB $00
 ; * 24  $18     Second cat read
 ; * 25	$19	dict
 ; * 26	$1A	bytes free
+
+Message_space	DB $00				; Text separator
+
+Text01		DM "Wot no "
+
+		DB $00				; Text separator
+Text02 		DM " error"
+
+		DB $00				; Text separator
+Text03		DM "File name "
+
+		DB $00				; Text separator
+Text04		DM " full"
+
+		DB $00				; Text separator
+Text05		DM "Disk "
+
+		DB $00				; Text separator
+Text06		DM "Check sum"
+		DB $82				; Link to " error"
+
+		DB $00				; Text separator
+Text07		DM "Verify"
+		DB $82				; Link to " error"
+
+		DB $00				; Text separator
+Text08		DB $81				; Link to "Wot no "
+		DM "disk ?"
+
+		DB $00				; Text separator
+Text09		DB $81				; Link to "Wot no "
+		DM "index hole ?"
+
+		DB $00				; Text separator
+Text10		DB $81				; Link to "Wot no "
+		DM "header ?"
+
+		DB $00				; Text separator
+Text11		DB $85				; Link to "Disk "
+		DM "is write protected"
+
+		DB $00				; Text separator
+Text12		DB $83				; Link to "File name "
+		DM "already exisits"
+
+		DB $00				; Text separator
+Text13		DB $83				; Link to "File name "
+		DM "not found"
+
+		DB $00				; Text separator
+Text15		DM "Cat"
+		DB $84				; Link to " full"
+
+		DB $00				; Text separator
+Text16		DB $85				; Link to "Disk "
+		DM "is"
+		DB $84				; Link to " full"
+
+		DB $00				; Text separator
+Text17		DM "BLD a "
+		DB $99				; Link to "dict"
+		DM " ??"
+
+		DB $00				; Text separator
+
+		DB $00				; Text separator
+Text18		DM "Why save 0 bytes ?"
+
+		DB $00				; Text separator
+
+		DB $00				; Text separator
+Text19		DM "Not enough RAM"
+
+		DB $00				; Text separator
+Text20		DM "Framing"
+		DB $82				; Link to " error"
+
+		DB $00				; Text separator
+Text21		DM "Overrun"
+		DB $82				; Link to " error"
+
+		DB $00				; Text separator
+Text22		DM "Parity"
+		DB $82				; Link to " error"
+
+		DB $00				; Text separator
+Text23		DM "Second cat read "
+
+		DB $00				; Text separator
+Text24		DM "dict"
+
+		DB $00				; Text separator
+Text25		DM " bytes free "
+
+		DB $00				; Text separator
+
+; * Message_space end
 
 
 ; *	2st Block of Words Definition starts at $FF45
