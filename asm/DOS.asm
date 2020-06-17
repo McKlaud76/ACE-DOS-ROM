@@ -2106,20 +2106,218 @@ LFF4B        	DW $0013            	; ???
 LFF4D	  	DW $F2AF		; 'link field' to 'name leght field' of
 					; CPY word
 
-LFF4F		DB $02			; 'name length field'
+LFF4F		DB $06			; 'name length field'
 
 LFF50	  	DW $0EC3            	; 'code field' - docolon
 
-LFF52		; to be completed
-
-
-
-
-
+LFF52		DW $1011		; Stack next word
+		DW $0008		; Print routine from ACE ROM
+		DW $1011		; Stack next word
+		DW $0028		; Init. routine from ACE ROM
+		DW $FFB5		; XFORMAT
+		DW $04B6		; Exit
 
 ; *********************************************************
 ; ***                                                   ***
-; ***         	  DLOAD word                            ***
+; ***         	  RUN word                              ***
+; ***                                                   ***
+; *********************************************************
+
+LFF5E	  	DM "RU"			; 'name field'
+        	DB 'N' + $80		; last charater inverted
+
+LFF61        	DW $0017            	; ???
+
+LFF63	  	DW $FF4F		; 'link field' to 'name leght field' of
+					; FORMAT word
+
+LFF65		DB $03			; 'name length field'
+
+LFF66	  	DW $0EC3            	; 'code field' - docolon
+
+LFF67		DW $FF8E		; SCRATCH
+		DW $FFFE		; DLOAD
+		DW $1011		; Stack next word
+		DW $3C4C		; CURRENT system variable
+		DW $08B3		; @
+		DW $0E09		; 1+
+		DW $069A		; EXECUTE
+		DW $04B6		; Exit
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  MAP word                              ***
+; ***                                                   ***
+; *********************************************************
+
+LFF78	  	DM "MA"			; 'name field'
+		DB 'P' + $80		; last charater inverted
+
+LFF7B        	DW $0007            	; ???
+
+LFF7D	  	DW $FF65		; 'link field' to 'name leght field' of
+					; RUN word
+
+LFF7F		DB $03			; 'name length field'
+
+LFF80	  	DW $F86C            	; “code field” address of machine code
+					; for MAP word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  SCRATCH word                              ***
+; ***                                                   ***
+; *********************************************************
+
+LFF82	  	DM "SCRATC"		; 'name field'
+		DB 'H' + $80		; last charater inverted
+
+LFF89        	DW $0007            	; ???
+
+LFF8B	  	DW $FF7F		; 'link field' to 'name leght field' of
+					; MAP word
+
+LFF8D		DB $07			; 'name length field'
+
+LFF8E	  	DW $F875            	; “code field” address of machine code
+					; for SCRATCH word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  RESAVE word                           ***
+; ***                                                   ***
+; *********************************************************
+
+LFF90	  	DM "RESAV"		; 'name field'
+		DB 'E' + $80		; last charater inverted
+
+LFF96        	DW $0007            	; ???
+
+LFF98	  	DW $FF8D		; 'link field' to 'name leght field' of
+					; SCRATCH word
+
+LFF9A		DB $06			; 'name length field'
+
+LFF9B	  	DW $F866            	; “code field” address of machine code
+					; for RESAVE word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  DRIVE word                            ***
+; ***                                                   ***
+; *********************************************************
+
+LFF9D	  	DM "DRIV"		; 'name field'
+		DB 'E' + $80		; last charater inverted
+
+LFFA2        	DW $0007            	; ???
+
+LFFA4	  	DW $FF9A		; 'link field' to 'name leght field' of
+					; RESAVE word
+
+LFFA6		DB $05			; 'name length field'
+
+LFFA7	  	DW $F81E            	; “code field” address of machine code
+					; for DRIVE word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  XFORMAT word                          ***
+; ***                                                   ***
+; *********************************************************
+
+LFFA9	  	DM "XFORMA"		; 'name field'
+		DB 'T' + $80		; last charater inverted
+
+LFFB0        	DW $0007            	; ???
+
+LFFB2	  	DW $FFA6		; 'link field' to 'name leght field' of
+					; DRIVE word
+
+LFFB4		DB $07			; 'name length field'
+
+LFFB5	  	DW $F830            	; “code field” address of machine code
+					; for XFORMAT word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  CAT word                              ***
+; ***                                                   ***
+; *********************************************************
+
+LFFB7	  	DM "CA"			; 'name field'
+		DB 'T' + $80		; last charater inverted
+
+LFFBA        	DW $0007            	; ???
+
+LFFBC	  	DW $FFB4		; 'link field' to 'name leght field' of
+					; XFORMAT word
+
+LFFBE		DB $03			; 'name length field'
+
+LFFBF	  	DW $F830            	; “code field” address of machine code
+					; for CAT word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  DELETE word                           ***
+; ***                                                   ***
+; *********************************************************
+
+LFFC1	  	DM "DELET"		; 'name field'
+		DB 'E' + $80		; last charater inverted
+
+LFFC7        	DW $0007            	; ???
+
+LFFC9	  	DW $FFBE		; 'link field' to 'name leght field' of
+					; CAT word
+
+LFFCB		DB $06			; 'name length field'
+
+LFFCC	  	DW $F854            	; “code field” address of machine code
+					; for DELETE word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  DBSAVE word                           ***
+; ***                                                   ***
+; *********************************************************
+
+LFFCE	  	DM "DBSAV"		; 'name field'
+        	DB 'E' + $80		; last charater inverted
+
+LFFD4        	DW $FFFF            	; ???
+
+LFFD6	  	DW $FFCB		; 'link field' to 'name leght field' of
+					;  DELETE word
+
+LFFD8		DB $06			; 'name length field'
+
+LFFD9	  	DW $F860            	; “code field” address of machine code
+					; for DBSAVE word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  DSAVE word                            ***
+; ***                                                   ***
+; *********************************************************
+
+LFFDB	  	DM "DSAV"		; 'name field'
+        	DB 'E' + $80		; last charater inverted
+
+LFFE0        	DW $0007            	; ???
+
+LFFE2	  	DW $FFD8		; 'link field' to 'name leght field' of
+					;  DBSAVE word
+
+LFFE4		DB $05			; 'name length field'
+
+LFFE5	  	DW $F85D            	; “code field” address of machine code
+					; for DSAVE word
+
+; *********************************************************
+; ***                                                   ***
+; ***         	  DBLOAD word                           ***
 ; ***                                                   ***
 ; *********************************************************
 
