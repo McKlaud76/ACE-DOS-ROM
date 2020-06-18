@@ -152,7 +152,6 @@ DICT            EQU  $3C39	;
 ; ***	       		D. word                         ***
 ; ***	                                                ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; Word to ...
@@ -179,7 +178,6 @@ LF009		DW $098D		; <#
 ; ***	       		E. word                         ***
 ; ***	                                                ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; Word to ...
@@ -214,7 +212,6 @@ LF01C		DW $1011		; Stack next word
 ; ***	       		RAMTOP word                     ***
 ; ***	                                                ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; Word to ...
@@ -241,7 +238,6 @@ LF041		DW $1011		; Stack next word
 ; ***	       	START-OF-NAMES word                     ***
 ; ***	                                                ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; Word to ...
@@ -271,7 +267,6 @@ LF05E		DW $F03F		; ???
 ; ***	       	FIND-FREE word 	                        ***
 ; ***	                                                ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; Word to ...
@@ -354,16 +349,108 @@ SCRATCH         JP $F8D5          ; $F875
 
 Fill_length     JP $FDF0          ; $F878
 
-; DLOAD
 
+; *********************************************************
+; ***                                                   ***
+; ***               DLOAD                               ***
+; ***                                                   ***
+; *********************************************************
+; * It is a Forth word.
 
+; * Loads a dict or bytes (At stored address) file from
+; * disk to RAM.
 
+; * No args or results.
 
-; SCRATCH
+; * Calls: Word, Load-cat, Lookup-word, Load-file, Off
+; *        and the Forth ROM for LOAD.
 
+                CALL Fill-length
+                CALL Word
+                CALL Load-cat
+                CALL Lookup-word            ; HL := start address,
+                                            ; DE := length and
+                                            ; B := file number.
+                LD A,H                      ; Test start address = 0
+                OR L                        ; Which indicates a dict.
+                JR Z,Dloadl1                ; Jump if dict.
 
+                CALL Load-file              ; Load bytes file at address
+                CALL Off                    ; Read from cat.
+                JP (IY)
 
+Dloadl1         LD ($2325),SP               ; Transfer SP to HL.
+                LD HL,($2325)
 
+                PUSH DE                     ; Save length to be loaded.
+                LD DE,$40                   ; There must be some room
+                OR A                        ; after loading.
+                SBC HL,DE
+                POP DE
+
+                PUSH HL                     ; Save top of usable RAM.
+                LD HL,(STKBOT)              ; Start point of loading.
+                ADD HL,DE                   ; End point of loading.
+                EX DE,HL		    ; in JAA listing was EX HL,DE - 01/06/2020
+                EX (SP),HL		    ; in JAA listing was EX HL,(SP) - 01/06/2020
+
+                ; At this point, HL = highest point which can be used,
+                ;                DE = highest point which will be used,
+                ; and the length of load is on the stack.
+
+                OR A                        ; Clear carry.
+                SBC HL,DE                   ; Compare.
+
+                POP DE
+                LD A,$F                     ; "Not enough RAM".
+                CALL C,Error-?              ; Error if DE was > HL.
+
+                LD HL,(STKBOT)              ; First free byte after dict.
+                PUSH DE
+                PUSH HL
+                CALL Load-file
+                CALL Off
+
+                POP HL
+                POP DE
+                DEC DE                      ; Two bytes were added
+                DEC DE                      ; for vocab pointer,
+                LD ($2325),DE               ; Will be read as length
+                                            ; added to diet.
+                ADD HL,DE
+                LD E,(HL)                  ; Read vocab pointer.
+                INC HL
+                LD D,(HL)
+                LD ($2329),DE               ; Will be read as newest
+                                            ; word.
+                JP $19AA                    ; Enter LOAD adjust section.
+
+; *********************************************************
+; ***                                                   ***
+; ***               SCRATCH                             ***
+; ***                                                   ***
+; *********************************************************
+; * It is a Forth word.
+
+; * Word to remove all words from dictionary,
+; * Similar to FORGET <Oldest word>.
+
+; * Calls: None.
+
+                LD HL,$3C4C                 ; Forth.
+                LD ($3C31),HL               ; CURRENT.
+                LD ($3C33),HL               ; CONTEXT.
+                LD L,$4F
+                LD ($3C35),HL               ; VOCLINK.
+                LD L,$51
+                LD ($3C37),HL               ; STKBOT.
+                LD L,$45
+                LD ($3C39),HL               ; DICT.
+                LD L,$5D
+                LD ($3C3B),HL               ; SPARE.
+                LD L,$49
+                LD ($3C4C),HL               ; Forth link - corrected from $3C49 - 01/06/2020
+                JP (IY)
 
 ; *********************************************************
 ; ***                                                   ***
@@ -777,7 +864,6 @@ Wait2       	DJNZ Wait2
 ; ***               DRIVE                               ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * It selects drive and side.
@@ -962,7 +1048,6 @@ Erknown         LD A,B
 ; ***                 XFORMAT                           ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * Word to write a blank catalogue to disk.
@@ -1385,7 +1470,6 @@ Numdigt         ADD $30             ; ASCII for "0".
 ; ***                     CAT                           ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * Gives a list of all the file names on the disk together
@@ -1643,7 +1727,6 @@ Delfl3          INC HL                  ; Copy one name and data.
 ; ***               DELETE                              ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * Word to delete a file.
@@ -1730,7 +1813,6 @@ Delfl3          INC HL                  ; Copy one name and data.
 ; ***               DSAVE                               ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * Word to store a dictionary file.
@@ -1752,7 +1834,6 @@ Delfl3          INC HL                  ; Copy one name and data.
 ; ***               DBSAVE                              ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * Wword to store a bytes file.
@@ -1787,14 +1868,12 @@ Delfl3          INC HL                  ; Copy one name and data.
 ; ***               DBLOAD                              ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * Word to load a bytes file.
 ; * Disk equivalent of BLOAD.
 
 ; * No arguments or results.
-
 
 ; * Calls; Load_cat,Load_file, Error_Msg and Off.
 
@@ -1827,7 +1906,6 @@ Bldlb           POP HL
 ; ***               RESAVE                              ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * Word to save a dictionary file under a name which
@@ -1873,7 +1951,6 @@ Bldlb           POP HL
 ; ***               MAP                                 ***
 ; ***                                                   ***
 ; *********************************************************
-
 ; * It is a FORTH word.
 
 ; * Prints the file number for each track as a  single
