@@ -11,39 +11,41 @@
 
 ; * ACE ROM Address:
 
-; * $F000	+-------------------------------------------
-; *		|
-; *		|	1st block of words definition using ROM routines
-; *		|
-; * $F2B0	+-------------------------------------------
-; *		|
-; * 		|	Empty block (1360 bytes of $FF)
-; *		|
-; * $F800	+-------------------------------------------
-; *		|
-; *		|	ACE DOS Jump Table
-; *		|
-; * $FF90	+-------------------------------------------
-; *		|
-; *		|	ACE DOS
-; *		|
-; * $FE07	+-------------------------------------------
-; *		|
-; *		|	Empty block (41 bytes of $FF)
-; *		|
-; * $FE30	+-------------------------------------------
-; *		|
-; *		|	Error Messages Space
-; *		|
-; * $FF2F	+-------------------------------------------
-; *		|
-; *		|	Empty block (22 bytes of $FF)
-; *		|
-; * $FF45	+-------------------------------------------
-; *		|
-; *		|	2nd block of words definition of ACE DOS
-; *		|
-; * $FFFF	+-------------------------------------------
+; * $F000	+-----------------------------------------+
+; *		|					  |
+; *		|	1st block of words definition 	  |
+; *		|	using ROM routines		  |
+; *		|					  |
+; * $F2B0	+-----------------------------------------+
+; *		|					  |
+; * 		|	Empty block (1360 bytes of $FF)   |
+; *		|					  |
+; * $F800	+-----------------------------------------+
+; *		|					  |
+; *		|	ACE DOS Jump Table		  |
+; *		|					  |
+; * $FF90	+-----------------------------------------+
+; *		|					  |
+; *		|	ACE DOS				  |
+; *		|					  |
+; * $FE07	+-----------------------------------------+
+; *		|					  |
+; *		|	Empty block (41 bytes of $FF)	  |
+; *		|					  |
+; * $FE30	+-----------------------------------------+
+; *		|					  |
+; *		|	Error Messages Space		  |
+; *		|					  |
+; * $FF2F	+-----------------------------------------+
+; *		|					  |
+; *		|	Empty block (26 bytes of $FF)	  |
+; *		|					  |
+; * $FF45	+-----------------------------------------+
+; *		|					  |
+; *		|	2nd block of words definition 	  |
+; *		|	of ACE DOS			  |
+; *		|					  |
+; * $FFFF	+-----------------------------------------+
 
 
 ; *********************************************************
@@ -52,15 +54,16 @@
 ; ***	                                                ***
 ; *********************************************************
 
-; * 1st block of ACE DOS word definitions start at $F000 with D. word:
+; * 1st block of ACE DOS word definitions start at $F000
+; * with D. word:
 
 ; * Address	Word
 ; * -------------------------------------------------------
 ; * $F000	D.
-; *		E.
-; * 		RAMTOP
-; * 		START-OF-NAMES
-; * 		FIND-FREE
+; * $F013	E.
+; * $F034	RAMTOP
+; * $F049	START-OF-NAMES
+; * $F06C	FIND-FREE
 ; * 		CAT-SINGLE-FILE
 ; * 		TEST-PAGE
 ; * 		CAT-HEADER
@@ -98,6 +101,49 @@
 
 		ORG $F000	   ; * added on 1/06/2020
 
+; *********************************************************
+; ***                                                   ***
+; ***               Constants                           ***
+; ***                                                   ***
+; *********************************************************
+
+Acia_status	EQU  $21        ; Acia status register.
+Acia_in         EQU  $23        ; Acia data input register.
+Acia_control    EQU  $01        ; Acia control register.
+Acia_out        EQU  $03        ; Acia data output register.
+
+Pia_a_i         EQU  $29        ; PIA port A data input.
+Pia_a_o         EQU  $09        ; PIA port A data output.
+Pia_b_o         EQU  $0D        ; PIA port B data output.
+Pia_a_cr        EQU  $0B        ; PIA port A control register.
+Pia_b_cr        EQU  $0F        ; PIA port B control register.
+
+Find_index	EQU  $F800	; Address of the fist entry
+				; to the Jump Table
+Dos_words       EQU  $FFFD      ; Address of 'name length field'
+                                ; of first DOS FORTH word DLOAD
+Forth_link      EQU  $3C47      ; Address of the 'link field'
+                                ; of the word FORTH.
+Cat_size        EQU  $F8FE      ; Address of the first of two
+                                ; bytes holding the length
+                                ; of the cat in bytes + 1.
+Message_space   EQU  $FE30      ; Address of the first string
+                                ; used by Print.
+Pad             EQU  $2701      ; Address of the FORTH PAD
+RAMTOP          EQU  $3C18      ; Hold the address of the highest
+                                ; byte used by the Jupiter Ace.
+                                ; The drive number is stored at
+                                ; (RAMTOP). The cat starts at
+                                ; (RAMTOP) + 1.
+                                ; where a word read by WORD
+                                ; is placed.
+Enter_forth     EQU  $04B9      ; Enter FORTH from machine code.
+WORD            EQU  $05AB      ; Parameter field address of WORD.
+End_forth       EQU  $1A0E      ; FORTH word to enter Z80 code.
+
+STKBOT          EQU  $3C37	;
+DICT            EQU  $3C39	;
+
 
 ; *	1st Block of Words Definition starts at $F000
 
@@ -114,16 +160,19 @@
 LF000	  	DM "D"			; 'name field'
         	DB '.' + $80		; last charater inverted
 
-LF002        	DW $0011            	; 'link field'
+LF002        	DW $0011            	; ???
 
-LF004	  	DW $0000
+LF004	  	DW $0000		; 'link field' - end of linked list
 
 LF006		DB $02			; 'name length field'
 
 LF007	  	DW $0EC3            	; 'code field' - docolon
 
-LF009		; to be completed
-
+LF009		DW $098D		; <#
+		DW $09E1		; #S
+		DW $099C		; #>
+		DW $096E		; TYPE
+		DW $04B6		; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -138,17 +187,27 @@ LF009		; to be completed
 LF013	  	DM "E"			; 'name field'
         	DB '.' + $80		; last charater inverted
 
-        	DW $001F		; ???
+LF015        	DW $001F            	; ???
 
-LF017	  	DW $F006     		; 'link field' to D. 'name length field'
+LF017	  	DW $F006		; 'link field' to
+					; D. 'name length field'
 
 LF019		DB $02			; 'name length field'
 
 LF01A	  	DW $0EC3            	; 'code field' - docolon
 
-LF01C		; to be completed
-
-
+LF01C		DW $1011		; Stack next word
+		DW $0000		; EXWRCH
+		DW $098D		; <#
+		DW $09E1		; #S
+		DW $099C		; #>
+		DW $1011		; Stack next word
+		DW $0007		; ????
+		DW $0912		; OVER
+		DW $0DE1		; #S
+		DW $0A83		; -
+		DW $096E		; TYPE
+		DW $04B6		; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -165,16 +224,81 @@ LF034	  	DM "RAMTO"		; 'name field'
 
         	DW $000F		; ???
 
-LF03C	  	DW $F019     		; 'link field' to E. 'name length field'
+LF03C	  	DW $F019     		; 'link field' to
+					; E. 'name length field'
 
 LF03E		DB $06			; 'name length field'
 
 LF03F	  	DW $0EC3            	; 'code field' - docolon
 
-LF041		; to be completed
+LF041		DW $1011		; Stack next word
+		DW $3C18		; RAMTOP
+		DW $08B3		; @
+		DW $04B6		; Exit
 
+; *********************************************************
+; ***	                                                ***
+; ***	       	START-OF-NAMES word                     ***
+; ***	                                                ***
+; *********************************************************
 
+; * It is a FORTH word.
 
+; Word to ...
+
+LF049	  	DM "START-OF-NAME"	; 'name field'
+        	DB 'S' + $80		; last charater inverted
+
+        	DW $0015		; ???
+
+LF059	  	DW $F03E     		; 'link field' to
+					; RAMTOP 'name length field'
+
+LF05B		DB $0E			; 'name length field'
+
+LF05C	  	DW $0EC3            	; 'code field' - docolon
+
+LF05E		DW $F03F		; ???
+		DW $0E09		; 1+
+		DW $086B		; DUP
+		DW $0896		; C@
+		DW $0DD2		; +
+		DW $0E09		; 1+
+		DW $04B6		; Exit
+
+; *********************************************************
+; ***	                                                ***
+; ***	       	FIND-FREE word 	                        ***
+; ***	                                                ***
+; *********************************************************
+
+; * It is a FORTH word.
+
+; Word to ...
+
+LF06C	  	DM "FIND-FRE"	; 'name field'
+        	DB 'E' + $80		; last charater inverted
+
+        	DW $0033		; ???
+
+LF077	  	DW $F05B     		; 'link field' to
+					; START-OF-NAMES  'name length field'
+
+LF079		DB $09			; 'name length field'
+
+LF07A	  	DW $0EC3            	; 'code field' - docolon
+
+LF07C		DW $1011		; Stack next word
+		DW $0000		; Zero - end marker
+		DW $F05C		; ???
+		DW $F03F		; ???
+		DW $1011		; Stack next word
+		DW $0004		; ???
+		DW $0DD2		; ???
+		DW $12E9		; I
+		DW $0896		; C@
+; ????
+; to be completed
 
 
 
@@ -230,46 +354,16 @@ SCRATCH         JP $F8D5          ; $F875
 
 Fill_length     JP $FDF0          ; $F878
 
-; *********************************************************
-; ***                                                   ***
-; ***               Constants                           ***
-; ***                                                   ***
-; *********************************************************
+; DLOAD
 
-Acia_status	EQU  $21        ; Acia status register.
-Acia_in         EQU  $23        ; Acia data input register.
-Acia_control    EQU  $01        ; Acia control register.
-Acia_out        EQU  $03        ; Acia data output register.
 
-Pia_a_i         EQU  $29        ; PIA port A data input.
-Pia_a_o         EQU  $09        ; PIA port A data output.
-Pia_b_o         EQU  $0D        ; PIA port B data output.
-Pia_a_cr        EQU  $0B        ; PIA port A control register.
-Pia_b_cr        EQU  $0F        ; PIA port B control register.
 
-Dos_words       EQU  $FFFD      ; Address of 'name length field'
-                                ; of first DOS FORTH word DLOAD
-Forth_link      EQU  $3C47      ; Address of the 'link field'
-                                ; of the word FORTH.
-Cat_size        EQU  $F8FE      ; Address of the first of two
-                                ; bytes holding the length
-                                ; of the cat in bytes + 1.
-Message_space   EQU  $FE30      ; Address of the first string
-                                ; used by Print.
-Pad             EQU  $2701      ; Address of the FORTH PAD
-RAMTOP          EQU  $3C18      ; Hold the address of the highest
-                                ; byte used by the Jupiter Ace.
-                                ; The drive number is stored at
-                                ; (RAMTOP). The cat starts at
-                                ; (RAMTOP) + 1.
-                                ; where a word read by WORD
-                                ; is placed.
-Enter_forth     EQU  $04B9      ; Enter FORTH from machine code.
-WORD            EQU  $05AB      ; Parameter field address of WORD.
-End_forth       EQU  $1A0E      ; FORTH word to enter Z80 code.
 
-STKBOT          EQU  $3C37	;
-DICT            EQU  $3C39	;
+; SCRATCH
+
+
+
+
 
 ; *********************************************************
 ; ***                                                   ***
@@ -1842,112 +1936,9 @@ Map2            DJNZ Catmap                 ; Print all tracks
 
 ; ---- in ROM ends at $FE06 - 01/06/2020
 
-; ---- in ROM starts at $F880 - 01/06/2020
-; *********************************************************
-; ***                                                   ***
-; ***               DLOAD                               ***
-; ***                                                   ***
-; *********************************************************
+; * Block of 41 empty bytes
 
-; * It is a FORTH word.
-
-; * Loads a dict or bytes (At stored address) file from
-; * disk to RAM.
-
-; * No args or results.
-
-; * Calls: Word, Load_cat, Lookup_word, Load_file, Off
-; *        and the FORTH ROM for LOAD.
-
-                CALL Fill_length
-                CALL Word
-                CALL Load_cat
-                CALL Lookup_word            ; HL := start address,
-                                            ; DE := length and
-                                            ; B := file number.
-                LD A,H                      ; Test start address = 0
-                OR L                        ; Which indicates a dict.
-                JR Z,Dloadl1                ; Jump if dict.
-
-                CALL Load_file              ; Load bytes file at address
-                CALL Off                    ; Read from cat.
-                JP (IY)
-
-Dloadl1         LD ($2325),SP               ; Transfer SP to HL.
-                LD HL,($2325)
-
-                PUSH DE                     ; Save length to be loaded.
-                LD DE,$40                   ; There must be some room
-                OR A                        ; after loading.
-                SBC HL,DE
-                POP DE
-
-                PUSH HL                     ; Save top of usable RAM.
-                LD HL,(STKBOT)              ; Start point of loading.
-                ADD HL,DE                   ; End point of loading.
-		EX DE,HL                    ; corrected from EX HL,DE - 01/06/2020
-                EX (SP),HL                  ; corrected from EX HL, (SP) - 01/06/2020
-
-                ; At this point, HL = highest point which can be used,
-                ;                DE = highest point which will be used,
-                ; and the length of load is on the stack.
-
-                OR A                        ; Clear carry.
-                SBC HL,DE                   ; Compare.
-
-                POP DE
-                LD A,$F                     ; "Not enough RAM".
-                CALL C,Error_Msg            ; Error if DE was > HL.
-
-                LD HL,(STKBOT)              ; First free byte after dict.
-                PUSH DE
-                PUSH HL
-                CALL Load_file
-                CALL Off
-
-                POP HL
-                POP DE
-                DEC DE                      ; Two bytes were added
-                DEC DE                      ; for vocab pointer,
-                LD ($2325),DE               ; Will be read as length
-                                            ; added to diet.
-                ADD HL,DE
-                LD E,(HL)                   ; Read vocab pointer.
-                INC HL
-                LD D,(HL)
-                LD ($2329),DE               ; Will be read as newest
-                                            ; word.
-                JP $19AA                    ; Enter LOAD adjust section.
-
-; *********************************************************
-; ***                                                   ***
-; ***               SCRATCH                             ***
-; ***                                                   ***
-; *********************************************************
-
-; * It is a FORTH word.
-
-; * Word to remove all words from dictionary,
-; * Similar to FORGET <Oldest word>.
-
-; * Calls: None.
-
-                LD HL,$3C4C                 ; Defult FORTH system varialbles.
-                LD ($3C31),HL               ; Reset CURRENT to $3C4C.
-                LD ($3C33),HL               ; Reset CONTEXT to $3C4C.
-                LD L,$4F
-                LD ($3C35),HL               ; Reset VOCLINK to $3C4F.
-                LD L,$51
-                LD ($3C37),HL               ; Reset STKBOT to $3C51.
-                LD L,$45
-                LD ($3C39),HL               ; Reset DICT to $3C45.
-                LD L,$5D
-                LD ($3C3B),HL               ; Reset SPARE to $3C5D.
-                LD L,$49
-                LD ($3C49),HL               ; Reset FORTH link to $3C49.
-                JP (IY)
-
-
+; ---- in ROM starts at $FE30
 ; *********************************************************
 ; ***                                                   ***
 ; ***               Message_space                       ***
@@ -1993,7 +1984,6 @@ Dloadl1         LD ($2325),SP               ; Transfer SP to HL.
 ; * 26	$1A	bytes free
 
 Message_space	DB $00				; Text separator
-
 Text01		DM "Wot no "
 
 		DB $00				; Text separator
