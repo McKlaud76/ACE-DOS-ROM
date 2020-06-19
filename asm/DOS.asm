@@ -490,7 +490,7 @@ LF1D3	  	DW $0EC3            	; 'code field' - docolon
 		DW $F113		; TEST-PAGE
 		DW $0885		; SWAP
 		DW $1276		; Branch (ROM routine)
-		DW $FFEB		; ???
+		DW $FFEB		; back to ???
 		DW $0879		; DROP
 		DW $0879		; DROP
 		DW $04B6		; Exit
@@ -594,8 +594,8 @@ LF249		DW $0EC3           	; 'code field' - docolon
 		DW $0885		; SWAP
 		DW $086B		; DUP
 		DW $0DD2		; +
-		DW $1276		; branch (ROM routine)
-		DW $FFE7		; to ???
+		DW $1276		; branch 	- relative jump
+		DW $FFE7		; back to ???
 		DW $0879		; DROP
 		DW $0E36		; OR
 		DW $04B6		; Exit
