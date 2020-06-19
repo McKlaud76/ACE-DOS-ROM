@@ -118,20 +118,27 @@ Pia_b_cr        EQU  $0F        ; PIA port B control register 	(0000 1111).
 
 Find_index	EQU  $F800	; Address of the fist entry
 				; to the Jump Table
-DOS_words       EQU  $FFFD      ; Address of 'name length field'
-                                ; of first DOS FORTH word DLOAD
-Forth_link      EQU  $3C47      ; Address of the 'link field'
-                                ; of the word FORTH.
 Cat_size        EQU  $F8FE      ; Address of the first of two
                                 ; bytes holding the length
                                 ; of the cat in bytes + 1.
 Message_space   EQU  $FE30      ; Address of the first string
                                 ; used by Print.
+DOS_words       EQU  $FFFD      ; Address of 'name length field'
+                                ; of first DOS FORTH word DLOAD
+
+Forth_link      EQU  $3C47      ; Address of the 'link field'
+                                ; of the word FORTH in ROM.
+
+
 Pad             EQU  $2701      ; Address of the FORTH PAD
 
 Enter_forth     EQU  $04B9      ; Enter FORTH from machine code.
 WORD            EQU  $05AB      ; Parameter field address of WORD.
 End_forth       EQU  $1A0E      ; FORTH word to enter Z80 code.
+
+Exit		EQU  $04B6	; Drops the 'Next Word' pointer from the
+				; Return Stack thereby ending a subroutine and
+				; returning to next word in calling thread.
 
 RAMTOP          EQU  $3C18      ; Hold the address of the highest
                                 ; byte used by the Jupiter Ace.
@@ -550,7 +557,6 @@ LF22E		DW $0EC3           	; 'code field' - docolon
 		DW $F1D3		;
 		DW $F205		;
 		DW $04B6		; Exit
-
 
 ; *********************************************************
 ; ***	                                                ***
@@ -1713,7 +1719,7 @@ Fwnotf          LD A,B              ; Find start of next word.
                 OR A                ; Clear carry.
                 SBC HL,DE           ; HL := -bytes used.
 
-                LD DE,($F8FE)       ; Cat size.
+                LD DE,(Cat_size)    ; Cat size.
                 ADD HL,DE           ; HL := bytes free.
 
                 ADD 8               ; bytes needed +3.
@@ -1989,7 +1995,7 @@ Notfree         DJNZ Freelp         ; Try all tracks.
 
                 LD HL,(RAMTOP)
                 INC HL              ; Miss the byte used for DRIVE.
-                LD DE,($F8FE)       ; Cat size.
+                LD DE,(Cat_size)     ; Cat size.
                 DEC DE              ; Don't save drive number.
                 RET
 
