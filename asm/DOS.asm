@@ -64,8 +64,8 @@
 ; * $F034	RAMTOP
 ; * $F049	START-OF-NAMES
 ; * $F06C	FIND-FREE
-; * 		CAT-SINGLE-FILE
-; * 		TEST-PAGE
+; * F0A8	CAT-SINGLE-FILE
+; * F105	TEST-PAGE
 ; * 		CAT-HEADER
 ; * 		CAT-FILES
 ; * 		CAT-END
@@ -80,20 +80,18 @@
 ; * Address	Word
 ; * -------------------------------------------------------
 ; * $FF45	FORMAT
-; * 		RUN
-; * 		MAP
-; * 		SCRATCH
-; * 		RESAVE
-; * 		DRIVE
-; * 		XFORMAT
-; * 		CAT
-; * 		DELETE
-; * 		DBSAVE
-; * 		DSAVE
-; * 		DBLOAD
-; * 		DLOAD
-
-
+; * $FF5E	RUN
+; * $FF78	MAP
+; * $FF82	SCRATCH
+; * $FF90	RESAVE
+; * $FF9D	DRIVE
+; * $FFA9	XFORMAT
+; * $FFB7	CAT
+; * $FFC1	DELETE
+; * $FFCE	DBSAVE
+; * $FFDB	DSAVE
+; * $FFE7	DBLOAD
+; * $FFF4	DLOAD
 
 ; *********************************************************
 
@@ -187,8 +185,8 @@ LF013	  	DM "E"			; 'name field'
 
 LF015        	DW $001F            	; ???
 
-LF017	  	DW $F006		; 'link field' to
-					; D. 'name length field'
+LF017	  	DW $F006		; 'link field' to 'name leght field' of
+					; D. word
 
 LF019		DB $02			; 'name length field'
 
@@ -221,8 +219,8 @@ LF034	  	DM "RAMTO"		; 'name field'
 
         	DW $000F		; ???
 
-LF03C	  	DW $F019     		; 'link field' to
-					; E. 'name length field'
+LF03C	  	DW $F019     		; 'link field' to 'name leght field' of
+					; E. word
 
 LF03E		DB $06			; 'name length field'
 
@@ -247,8 +245,8 @@ LF049	  	DM "START-OF-NAME"	; 'name field'
 
         	DW $0015		; ???
 
-LF059	  	DW $F03E     		; 'link field' to
-					; RAMTOP 'name length field'
+LF059	  	DW $F03E     		; 'link field' to 'name leght field' of
+					; RAMTOP word
 
 LF05B		DB $0E			; 'name length field'
 
@@ -257,7 +255,7 @@ LF05C	  	DW $0EC3            	; 'code field' - docolon
 LF05E		DW $F03F		; ???
 		DW $0E09		; 1+
 		DW $086B		; DUP
-		DW $0896		; C@
+		DW $0896		; C@            - fetch content byte
 		DW $0DD2		; +
 		DW $0E09		; 1+
 		DW $04B6		; Exit
@@ -271,13 +269,13 @@ LF05E		DW $F03F		; ???
 
 ; Word to ...
 
-LF06C	  	DM "FIND-FRE"	; 'name field'
+LF06C	  	DM "FIND-FRE"		; 'name field'
         	DB 'E' + $80		; last charater inverted
 
         	DW $0033		; ???
 
-LF077	  	DW $F05B     		; 'link field' to
-					; START-OF-NAMES  'name length field'
+LF077	  	DW $F05B     		; 'link field' to 'name leght field' of
+					; START-OF-NAMES word
 
 LF079		DB $09			; 'name length field'
 
@@ -285,16 +283,91 @@ LF07A	  	DW $0EC3            	; 'code field' - docolon
 
 LF07C		DW $1011		; Stack next word
 		DW $0000		; Zero - end marker
-		DW $F05C		; ???
-		DW $F03F		; ???
+		DW $F05C		; START-OF-NAMES
+		DW $F03F		; RAMTOP
 		DW $1011		; Stack next word
 		DW $0004		; ???
-		DW $0DD2		; ???
+		DW $0DD2		; +
+		DW $1323		; shuffle (ROM routine)
 		DW $12E9		; I
-		DW $0896		; C@
+		DW $0896		; C@            - fetch content byte
+		DW $0C1A		; 0=
+		DW $1283		; ?branch (ROM routine)
+		DW $0005		; ???
+		DW $0E09		; 1+
+		DW $12A4		; End?
+		DW $1332		; shuffle (ROM routine)
+		DW $FFEF		; DBLOAD
+		DW $0F3F		; ???
+		DW $0E13		; 2+
+		DW $08B3		; @
+		DW $0CA8		; U*
+		DW $04B6		; Exit
+
+; *********************************************************
+; ***	                                                ***
+; ***	       	CAT-SINGLE-FILE word 	                ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; Word to ...
+
+LF0A8	  	DM "CAT-SINGLE-FIL"	; 'name field'
+        	DB 'E' + $80		; last charater inverted
+
+        	DW $0033		; ???
+
+LF0B9	  	DW $F079     		; 'link field' to 'name leght field' of
+					; FIND-FREE word
+
+LF0BB		DB $0F			; 'name length field'
+
+LF0BC	  	DW $0EC3            	; 'code field' - docolon
+
+LF0BE		DW $0912		; OVER
+		DW $0E09		; 1+
+		DW $0912		; OVER
+		DW $096E		; TYPE
+		DW $1011		; Stack next word
+		DW $0010		; Push word DE if non-zero
+		DW $0912		; OVER
+		DW $0DE1		; -
+		DW $1011		; Stack next word
+		DW $001F
 ; ????
+		DW $04B6		; Exit
+; ????
+
+; *********************************************************
+; ***	                                                ***
+; ***	       	TEST-PAGE word                          ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; Word to ...
+
+LF105	  	DM "TEST-PAG"		; 'name field'
+        	DB 'E' + $80		; last charater inverted
+
+        	DW $0023		; ???
+
+LF110	  	DW $F0BB     		; 'link field' to 'name leght field' of
+					; CAT-SINGLE-FILE word
+
+LF0BB		DB $09			; 'name length field'
+
+LF0BC	  	DW $0EC3            	; 'code field' - docolon
+
+LF115		DW $0E1F		; 1-
+		DW $086B		; DUP
+;???
+		DW $04B6		; Exit
+
 ; to be completed
 
+LF131
 
 
 
@@ -1826,8 +1899,6 @@ Delfl3          INC HL                  ; Copy one name and data.
                 CALL Load_cat
                 CALL Save
                 JP (IY)
-
-
 
 ; *********************************************************
 ; ***                                                   ***
