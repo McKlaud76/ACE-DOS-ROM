@@ -64,16 +64,16 @@
 ; * $F034	RAMTOP
 ; * $F049	START-OF-NAMES
 ; * $F06C	FIND-FREE
-; * F0A8	CAT-SINGLE-FILE
-; * F105	TEST-PAGE
-; * 		CAT-HEADER
-; * 		CAT-FILES
-; * 		CAT-END
-; * 		PRINT-CAT
-; * 		DRIVE-NUMBER
-; * 		LOAD-CAT
-; * 		DIR
-; * 		CPY
+; * $F0A8	CAT-SINGLE-FILE
+; * $F105	TEST-PAGE
+; * $F131	CAT-HEADER
+; * $F1C5	CAT-FILES
+; * $F1F9	CAT-END
+; * $F220	PRINT-CAT
+; * $F238	DRIVE-NUMBER
+; * $F281	LOAD-CAT
+; * $F298	DIR
+; * $F2A8	CPY
 
 ; * 2nd block of ACE DOS word definitions start at $FF45 with FORMAT word:
 
@@ -356,12 +356,16 @@ LF105	  	DM "TEST-PAG"		; 'name field'
 LF110	  	DW $F0BB     		; 'link field' to 'name leght field' of
 					; CAT-SINGLE-FILE word
 
-LF0BB		DB $09			; 'name length field'
+LF112		DB $09			; 'name length field'
 
-LF0BC	  	DW $0EC3            	; 'code field' - docolon
+LF113	  	DW $0EC3            	; 'code field' - docolon
 
 LF115		DW $0E1F		; 1-
 		DW $086B		; DUP
+		DW $081A		; VIS
+		DW $0C83		; D<
+		DW $1112
+		DW $9F00
 ;???
 		DW $04B6		; Exit
 
