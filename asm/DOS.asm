@@ -14,7 +14,7 @@
 ; * $F000	+-----------------------------------------+
 ; *		|					  |
 ; *		|	1st block of words definition 	  |
-; *		|	using ROM routines		  |
+; *		|	mainly using ROM routines	  |
 ; *		|					  |
 ; * $F2B0	+-----------------------------------------+
 ; *		|					  |
@@ -201,7 +201,7 @@ LF01C		DW $1011		; Stack next word
 		DW $0007		; ????
 		DW $0912		; OVER
 		DW $0DE1		; #S
-		DW $0A83		; -
+		DW $0A83		; SPACES
 		DW $096E		; TYPE
 		DW $04B6		; Exit
 
@@ -335,6 +335,8 @@ LF0BE		DW $0912		; OVER
 		DW $0DE1		; -
 		DW $1011		; Stack next word
 		DW $001F
+LF0D2		DW $0E4B		; AND
+		DW $0A83		; SPACES
 ; ????
 		DW $04B6		; Exit
 ; ????
@@ -362,18 +364,176 @@ LF113	  	DW $0EC3            	; 'code field' - docolon
 
 LF115		DW $0E1F		; 1-
 		DW $086B		; DUP
-		DW $081A		; VIS
-		DW $0C83		; D<
-		DW $1112
-		DW $9F00
+		DW $0C1A		; 0=
+		DW $1283		; ?branch       - forward if not a
+ 		DW $1112		; DUP
+LF11E ???	DW $9F00
 ;???
-		DW $04B6		; Exit
 
 ; to be completed
 
-LF131
+LF12F		DW $04B6		; Exit
+
+; to be completed
+
+; *********************************************************
+; ***	                                                ***
+; ***	       		CAT-HEADER word                 ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; Word to ...
+
+LF131	  	DM "CAT-HEADE"		; 'name field'
+        	DB 'R' + $80		; last charater inverted
+
+        	DW $007A		; 'word lenght field'
+
+LF13D	  	DW $F112     		; 'link field' to 'name leght field' of
+					; TEST-PAGE word
+
+LF13F		DB $0A			; 'name length field'
+
+LF140	  	DW $0EC3            	; 'code field' - docolon
+
+		DW $0A1D		; CLS
+		DW $1396		; pr_embedded string
+
+; to be completed
+
+LF1B3		DW $04B6		; Exit
+
+; $F1B5 - $F1C4 - 26 bytes of $FF
+
+; *********************************************************
+; ***	                                                ***
+; ***	       		CAT-FILE word                   ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; to be completed
+
+LF1C5
+
+; to be completed
+
+LF1F7		DW $04B6		; Exit
+
+; *********************************************************
+; ***	                                                ***
+; ***	       		CAT-END word                    ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; to be completed
+
+LF1F9
+
+; to be completed
+
+; *********************************************************
+; ***	                                                ***
+; ***	       		PRINT-CAT word                  ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; Word to ...
+
+LF220	  	DM "PRINT-CA"		; 'name field'
+        	DB 'T' + $80		; last charater inverted
+
+LF229        	DW $000F            	; ????
+
+LF22B	  	DW $F204		; 'link field' to 'name leght field' of
+					; CAT-END word
+
+LF22D		DB $09			; 'name length field'
+
+LF22E		DW $0EC3           	; 'code field' - docolon
+		DW $F140		; CAT-HEADER
+		DW $F1D3		;
+		DW $F205		;
+		DW $04B6		; Exit
 
 
+; to be completed DRIVE-NUMBER
+
+LF238
+
+; *********************************************************
+; ***	                                                ***
+; ***	       		LOAD-CAT word                   ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; Word to ...
+
+LF281	  	DM "LOAD-CA"		; 'name field'
+        	DB 'T' + $80		; last charater inverted
+
+LF289        	DW $0000            	; ????
+
+LF28B	  	DW $F248		; 'link field' to 'name leght field' of
+					; DRIVE word
+
+LF28D		DB $08			; 'name length field'
+
+LF28E		DW $F290            	; 'code field'
+
+LF290		CALL Load_cat		; Load_cat
+		CALL Off		; Off
+		JP (IY)			; FORTH return.
+
+; *********************************************************
+; ***	                                                ***
+; ***	       		DIR word                        ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; Word to ...
+
+LF298	  	DM "DI"			; 'name field'
+        	DB 'R' + $80		; last charater inverted
+
+LF29B        	DW $0000            	; ????
+
+LF29D	  	DW $F28D		; 'link field' to 'name leght field' of
+					; LOAD-CAT word
+
+LF29F		DB $03			; 'name length field'
+
+LF2A0		DW $0EC3            	; 'code field' - docolon
+
+LF2A2		DW $F28E		;
+		DW $F22E		; LOAD-CAT
+		DW $04B6		; Exit
+
+; *********************************************************
+; ***	                                                ***
+; ***	       		CPY word                        ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
+
+; Word to ...
+
+LF2A8	  	DM "CP"			; 'name field'
+        	DB 'Y' + $80		; last charater inverted
+
+LF2AB        	DW $0000            	; ????
+
+LF2AD	  	DW $F29F		; 'link field' to 'name leght field' of
+					; DIR word
+
+LF2AF		DB $03			; 'name length field'
+
+; $72B0 - $F7FF: 1360 bytes of $FF
 
 ; *********************************************************
 ; ***	                                                ***
