@@ -110,15 +110,15 @@ Acia_in         EQU  $23        ; Acia data input register.
 Acia_control    EQU  $01        ; Acia control register.
 Acia_out        EQU  $03        ; Acia data output register.
 
-Pia_a_i         EQU  $29        ; PIA port A data input.
-Pia_a_o         EQU  $09        ; PIA port A data output.
-Pia_b_o         EQU  $0D        ; PIA port B data output.
-Pia_a_cr        EQU  $0B        ; PIA port A control register.
-Pia_b_cr        EQU  $0F        ; PIA port B control register.
+Pia_a_i         EQU  $29        ; PIA port A data input 	(0010 1001).
+Pia_a_o         EQU  $09        ; PIA port A data output 	(0000 1001).
+Pia_b_o         EQU  $0D        ; PIA port B data output 	(0000 1101).
+Pia_a_cr        EQU  $0B        ; PIA port A control register 	(0000 1011).
+Pia_b_cr        EQU  $0F        ; PIA port B control register 	(0000 1111).
 
 Find_index	EQU  $F800	; Address of the fist entry
 				; to the Jump Table
-Dos_words       EQU  $FFFD      ; Address of 'name length field'
+DOS_words       EQU  $FFFD      ; Address of 'name length field'
                                 ; of first DOS FORTH word DLOAD
 Forth_link      EQU  $3C47      ; Address of the 'link field'
                                 ; of the word FORTH.
@@ -128,6 +128,11 @@ Cat_size        EQU  $F8FE      ; Address of the first of two
 Message_space   EQU  $FE30      ; Address of the first string
                                 ; used by Print.
 Pad             EQU  $2701      ; Address of the FORTH PAD
+
+Enter_forth     EQU  $04B9      ; Enter FORTH from machine code.
+WORD            EQU  $05AB      ; Parameter field address of WORD.
+End_forth       EQU  $1A0E      ; FORTH word to enter Z80 code.
+
 RAMTOP          EQU  $3C18      ; Hold the address of the highest
                                 ; byte used by the Jupiter Ace.
                                 ; The drive number is stored at
@@ -135,13 +140,14 @@ RAMTOP          EQU  $3C18      ; Hold the address of the highest
                                 ; (RAMTOP) + 1.
                                 ; where a word read by WORD
                                 ; is placed.
-Enter_forth     EQU  $04B9      ; Enter FORTH from machine code.
-WORD            EQU  $05AB      ; Parameter field address of WORD.
-End_forth       EQU  $1A0E      ; FORTH word to enter Z80 code.
-
-STKBOT          EQU  $3C37	;
-DICT            EQU  $3C39	;
-
+STKBOT          EQU  $3C37	; The address of the next byte into
+				; which anything will be enclosed in the
+				; dictionary, i.e. one byte past the present end
+				; of the dictionary.
+DICT            EQU  $3C39	; The address of the length field in the
+				; newest word in the dictionary. If that length
+                                ; field is correctly filled in then DICT may
+                                ; be 0.
 
 ; *	1st Block of Words Definition starts at $F000
 
@@ -227,7 +233,7 @@ LF03E		DB $06			; 'name length field'
 LF03F	  	DW $0EC3            	; 'code field' - docolon
 
 LF041		DW $1011		; Stack next word
-		DW $3C18		; RAMTOP
+		DW RAMTOP		; Ramtop
 		DW $08B3		; @
 		DW $04B6		; Exit
 
@@ -366,13 +372,16 @@ LF115		DW $0E1F		; 1-
 		DW $086B		; DUP
 		DW $0C1A		; 0=
 		DW $1283		; ?branch       - forward if not a
- 		DW $1112		; DUP (the same as $086B)
-LF11E ???	DW $9F00
-;???
-
-; to be completed
-
-LF12F		DW $04B6		; Exit
+ 		DW $0011		; ???
+		DW $129F		; Forth
+		DW $0BDB		; INKEY
+		DW $128D		; ?branch
+		DW $FFFB		; ???
+		DW $0879		; DROP
+		DW $1011		; Stack next word
+		DW $000F		; ???
+		DW $12A4		; ?end
+		DW $04B6		; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -467,7 +476,7 @@ LF1D3	  	DW $0EC3            	; 'code field' - docolon
 		DW $FFEB		; ???
 		DW $0879		; DROP
 		DW $0879		; DROP
-LF1F7		DW $04B6		; Exit
+		DW $04B6		; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -519,15 +528,60 @@ LF22B	  	DW $F204		; 'link field' to 'name leght field' of
 LF22D		DB $09			; 'name length field'
 
 LF22E		DW $0EC3           	; 'code field' - docolon
+
 		DW $F140		; CAT-HEADER
 		DW $F1D3		;
 		DW $F205		;
 		DW $04B6		; Exit
 
 
-; to be completed DRIVE-NUMBER
+; *********************************************************
+; ***	                                                ***
+; ***	       		DRIVE-NUMBER word               ***
+; ***	                                                ***
+; *********************************************************
+; * It is a FORTH word.
 
-LF238
+; Word to ...
+
+LF220	  	DM "DRIVE-NUMBE"	; 'name field'
+        	DB 'R' + $80		; last charater inverted
+
+LF244        	DW $003D            	; 'word lenght field'
+
+LF246	  	DW $F22D		; 'link field' to 'name leght field' of
+					; PRINT-CAT word
+
+LF248		DB $0C			; 'name length field'
+
+LF249		DW $0EC3           	; 'code field' - docolon
+		DW $0F3F		; ???
+		DW $0896		; C@            - fetch content byte
+		DB $086B		; DUP
+		DW $0E09		; 1+
+		DW $1011		; Stack next word
+		DW $0001		; ???
+		DW $0E4B		; AND
+		DW $1011		; Stack next word
+		DW $000C		; ???
+		DW $08FF		; ROT
+		DW $129F		; Forth
+		DW $086B		; DUP
+		DW $1011		; Stack next word
+		DW $0008		; ???
+		DW $0E4B		; AND
+		DW $1288		; ?branch (ROM routine)
+		DW $000F		; ???
+		DW $0885		; SWAP
+		DW $0E29		; 2-
+		DW $0885		; SWAP
+		DW $086B		; DUP
+		DW $0DD2		; +
+		DW $1276		; branch (ROM routine)
+		DW $FFE7		; ???
+		DW $0879		; DROP
+		DW $0E36		; OR
+		DW $04B6		; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -2468,7 +2522,7 @@ Text25		DM " bytes free "
 LFF45	  	DM "FORMA"		; 'name field'
         	DB 'T' + $80		; last charater inverted
 
-LFF4B        	DW $0013            	; ???
+LFF4B        	DW $0013            	; 'word lenght field'
 
 LFF4D	  	DW $F2AF		; 'link field' to 'name leght field' of
 					; CPY word
@@ -2493,7 +2547,7 @@ LFF52		DW $1011		; Stack next word
 LFF5E	  	DM "RU"			; 'name field'
         	DB 'N' + $80		; last charater inverted
 
-LFF61        	DW $0017            	; ???
+LFF61        	DW $0017            	; 'word lenght field'
 
 LFF63	  	DW $FF4F		; 'link field' to 'name leght field' of
 					; FORMAT word
@@ -2520,7 +2574,7 @@ LFF67		DW $FF8E		; SCRATCH
 LFF78	  	DM "MA"			; 'name field'
 		DB 'P' + $80		; last charater inverted
 
-LFF7B        	DW $0007            	; ???
+LFF7B        	DW $0007            	; 'word lenght field'
 
 LFF7D	  	DW $FF65		; 'link field' to 'name leght field' of
 					; RUN word
@@ -2532,14 +2586,14 @@ LFF80	  	DW $F86C            	; “code field” address of machine code
 
 ; *********************************************************
 ; ***                                                   ***
-; ***         	  SCRATCH word                              ***
+; ***         	  SCRATCH word                          ***
 ; ***                                                   ***
 ; *********************************************************
 
 LFF82	  	DM "SCRATC"		; 'name field'
 		DB 'H' + $80		; last charater inverted
 
-LFF89        	DW $0007            	; ???
+LFF89        	DW $0007            	; 'word lenght field'
 
 LFF8B	  	DW $FF7F		; 'link field' to 'name leght field' of
 					; MAP word
@@ -2558,7 +2612,7 @@ LFF8E	  	DW $F875            	; “code field” address of machine code
 LFF90	  	DM "RESAV"		; 'name field'
 		DB 'E' + $80		; last charater inverted
 
-LFF96        	DW $0007            	; ???
+LFF96        	DW $0007            	; 'word lenght field'
 
 LFF98	  	DW $FF8D		; 'link field' to 'name leght field' of
 					; SCRATCH word
@@ -2577,7 +2631,7 @@ LFF9B	  	DW $F866            	; “code field” address of machine code
 LFF9D	  	DM "DRIV"		; 'name field'
 		DB 'E' + $80		; last charater inverted
 
-LFFA2        	DW $0007            	; ???
+LFFA2        	DW $0007            	; 'word lenght field'
 
 LFFA4	  	DW $FF9A		; 'link field' to 'name leght field' of
 					; RESAVE word
@@ -2596,7 +2650,7 @@ LFFA7	  	DW $F81E            	; “code field” address of machine code
 LFFA9	  	DM "XFORMA"		; 'name field'
 		DB 'T' + $80		; last charater inverted
 
-LFFB0        	DW $0007            	; ???
+LFFB0        	DW $0007            	; 'word lenght field'
 
 LFFB2	  	DW $FFA6		; 'link field' to 'name leght field' of
 					; DRIVE word
@@ -2615,7 +2669,7 @@ LFFB5	  	DW $F830            	; “code field” address of machine code
 LFFB7	  	DM "CA"			; 'name field'
 		DB 'T' + $80		; last charater inverted
 
-LFFBA        	DW $0007            	; ???
+LFFBA        	DW $0007            	; 'word lenght field'
 
 LFFBC	  	DW $FFB4		; 'link field' to 'name leght field' of
 					; XFORMAT word
@@ -2634,7 +2688,7 @@ LFFBF	  	DW $F830            	; “code field” address of machine code
 LFFC1	  	DM "DELET"		; 'name field'
 		DB 'E' + $80		; last charater inverted
 
-LFFC7        	DW $0007            	; ???
+LFFC7        	DW $0007            	; 'word lenght field'
 
 LFFC9	  	DW $FFBE		; 'link field' to 'name leght field' of
 					; CAT word
@@ -2672,7 +2726,7 @@ LFFD9	  	DW $F860            	; “code field” address of machine code
 LFFDB	  	DM "DSAV"		; 'name field'
         	DB 'E' + $80		; last charater inverted
 
-LFFE0        	DW $0007            	; ???
+LFFE0        	DW $0007            	; 'word lenght field'
 
 LFFE2	  	DW $FFD8		; 'link field' to 'name leght field' of
 					;  DBSAVE word
@@ -2691,7 +2745,7 @@ LFFE5	  	DW $F85D            	; “code field” address of machine code
 LFFE7	  	DM "DBLOA"		; 'name field'
         	DB 'D' + $80		; last charater inverted
 
-LFFED        	DW $0007            	; ???
+LFFED        	DW $0007            	; 'word lenght field'
 
 LFFEF	  	DW $FFE4		; 'link field' to 'name leght field' of
 					;  DSAVE word
