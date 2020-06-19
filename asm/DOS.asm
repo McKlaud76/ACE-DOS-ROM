@@ -299,9 +299,9 @@ LF07C		DW $1011		; Stack next word
 		DW $0896		; C@            - fetch content byte
 		DW $0C1A		; 0=
 		DW $1283		; ?branch (ROM routine)
-		DW $0005		; ???
+		DW $0005		; to ???
 		DW $0E09		; 1+
-		DW $12A4		; End?
+		DW $12A4		; ?end
 		DW $1332		; shuffle (ROM routine)
 		DW $FFEF		; DBLOAD
 		DW $0F3F		; ???
@@ -341,11 +341,28 @@ LF0BE		DW $0912		; OVER
 		DW $0DE1		; -
 		DW $1011		; Stack next word
 		DW $001F
-LF0D2		DW $0E4B		; AND
+		DW $0E4B		; AND
 		DW $0A83		; SPACES
-; ????
+		DW $0DD2		; +
+		DW $086B		; DUP
+		DW $08B3		; @
+		DW $F01A		; E.
+		DW $0E13		; 2+
+		DW $086B		; DUP
+		DW $08B3		; @
+		DW $08EE		; ?DUP		- duplicate if found
+		DW $1283		; ?branch
+		DW $0007		; to ???
+		DW $F01A		; E.
+		DW $1271		; Branch
+		DW $000E
+		DW $1396		; Print embedded string (ROM routine)
+		DW $0007		; 7 characters in string
+LF0F6		DM "   dict"
+		DW $12A4		; ?end
+		DW $0E13		; 2+
+		DW $0A95		; CR
 		DW $04B6		; Exit
-; ????
 
 ; *********************************************************
 ; ***	                                                ***
@@ -372,7 +389,7 @@ LF115		DW $0E1F		; 1-
 		DW $086B		; DUP
 		DW $0C1A		; 0=
 		DW $1283		; ?branch       - forward if not a
- 		DW $0011		; ???
+ 		DW $0011		; to ???
 		DW $129F		; Forth
 		DW $0BDB		; INKEY
 		DW $128D		; ?branch
@@ -467,7 +484,7 @@ LF1D3	  	DW $0EC3            	; 'code field' - docolon
 		DW $0896		; C@            - fetch content byte
 		DW $08EE		; ?DUP          - duplicate if found
 		DW $1288		; ?branch (ROM routine)
-		DW $000D		; ???
+		DW $000D		; to ???
 		DW $F0BC		; CAT-SINGLE-FILE
 		DW $0885		; SWAP
 		DW $F113		; TEST-PAGE
@@ -571,14 +588,14 @@ LF249		DW $0EC3           	; 'code field' - docolon
 		DW $0008		; ???
 		DW $0E4B		; AND
 		DW $1288		; ?branch (ROM routine)
-		DW $000F		; ???
+		DW $000F		; to ???
 		DW $0885		; SWAP
 		DW $0E29		; 2-
 		DW $0885		; SWAP
 		DW $086B		; DUP
 		DW $0DD2		; +
 		DW $1276		; branch (ROM routine)
-		DW $FFE7		; ???
+		DW $FFE7		; to ???
 		DW $0879		; DROP
 		DW $0E36		; OR
 		DW $04B6		; Exit
