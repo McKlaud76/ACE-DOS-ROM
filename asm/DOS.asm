@@ -47,7 +47,6 @@
 ; *		|					  |
 ; * $FFFF	+-----------------------------------------+
 
-
 ; *********************************************************
 ; ***	                                                ***
 ; ***	       ACE DOS FORTH Words Index                ***
@@ -93,11 +92,7 @@
 ; * $FFE7	DBLOAD
 ; * $FFF4	DLOAD
 
-; *********************************************************
-
-; * ASM Listing starting point
-
-		ORG $F000	   ; * added on 1/06/2020
+; * -------------------------------------------------------
 
 ; *********************************************************
 ; ***                                                   ***
@@ -105,16 +100,16 @@
 ; ***                                                   ***
 ; *********************************************************
 
-Acia_status	EQU  $21        ; Acia status register.
-Acia_in         EQU  $23        ; Acia data input register.
-Acia_control    EQU  $01        ; Acia control register.
-Acia_out        EQU  $03        ; Acia data output register.
+Acia_status	EQU  $21        ; Acia status register
+Acia_in         EQU  $23        ; Acia data input register
+Acia_control    EQU  $01        ; Acia control register
+Acia_out        EQU  $03        ; Acia data output register
 
-Pia_a_i         EQU  $29        ; PIA port A data input 	(0010 1001).
-Pia_a_o         EQU  $09        ; PIA port A data output 	(0000 1001).
-Pia_b_o         EQU  $0D        ; PIA port B data output 	(0000 1101).
-Pia_a_cr        EQU  $0B        ; PIA port A control register 	(0000 1011).
-Pia_b_cr        EQU  $0F        ; PIA port B control register 	(0000 1111).
+Pia_a_i         EQU  $29        ; PIA port A data input 	(0010 1001)
+Pia_a_o         EQU  $09        ; PIA port A data output 	(0000 1001)
+Pia_b_o         EQU  $0D        ; PIA port B data output 	(0000 1101)
+Pia_a_cr        EQU  $0B        ; PIA port A control register 	(0000 1011)
+Pia_b_cr        EQU  $0F        ; PIA port B control register 	(0000 1111)
 
 Find_index	EQU  $F800	; Address of the fist entry
 				; to the Jump Table
@@ -133,7 +128,7 @@ Forth_link      EQU  $3C47      ; Address of the 'link field'
 Pad             EQU  $2701      ; Address of the FORTH PAD
 
 Enter_forth     EQU  $04B9      ; Enter FORTH from machine code.
-WORD            EQU  $05AB      ; Parameter field address of WORD.
+ROM_WORD        EQU  $05AB      ; Parameter field address of WORD.
 End_forth       EQU  $1A0E      ; FORTH word to enter Z80 code.
 
 Exit		EQU  $04B6	; Drops the 'Next Word' pointer from the
@@ -155,6 +150,10 @@ DICT            EQU  $3C39	; The address of the length field in the
 				; newest word in the dictionary. If that length
                                 ; field is correctly filled in then DICT may
                                 ; be 0.
+
+; * ASM Listing starting point
+
+		ORG $F000	   ; * added on 1/06/2020
 
 ; *	1st Block of Words Definition starts at $F000
 
@@ -182,7 +181,7 @@ LF009		DW $098D		; <#
 		DW $09E1		; #S
 		DW $099C		; #>
 		DW $096E		; TYPE
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -216,7 +215,7 @@ LF01C		DW $1011		; Stack next word
 		DW $0DE1		; #S
 		DW $0A83		; SPACES
 		DW $096E		; TYPE
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -242,7 +241,7 @@ LF03F	  	DW $0EC3            	; 'code field' - docolon
 LF041		DW $1011		; Stack next word
 		DW RAMTOP		; Ramtop
 		DW $08B3		; @
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -271,7 +270,7 @@ LF05E		DW $F03F		; ???
 		DW $0896		; C@            - fetch content byte
 		DW $0DD2		; +
 		DW $0E09		; 1+
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -315,7 +314,7 @@ LF07C		DW $1011		; Stack next word
 		DW $0E13		; 2+
 		DW $08B3		; @
 		DW $0CA8		; U*
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -369,7 +368,7 @@ LF0F6		DM "   dict"
 		DW $12A4		; ?end
 		DW $0E13		; 2+
 		DW $0A95		; CR
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -405,7 +404,7 @@ LF115		DW $0E1F		; 1-
 		DW $1011		; Stack next word
 		DW $000F		; ???
 		DW $12A4		; ?end
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -458,7 +457,7 @@ LF184		DM "bytes"		;
 LF191		DM "File name        Length   Type"
  		DB $0A95		; CR
 		DB $0A95		; CR
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; $F1B5 - $F1C4 - 26 bytes of $FF
 
@@ -500,7 +499,7 @@ LF1D3	  	DW $0EC3            	; 'code field' - docolon
 		DW $FFEB		; back to ???
 		DW $0879		; DROP
 		DW $0879		; DROP
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -530,7 +529,7 @@ LF205	  	DW $0EC3            	; 'code field' - docolon
 		DW $000B		; 11 characters in string
 LF211		DM " bytes free"	;
 		DW $0A95		; CR
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -556,7 +555,7 @@ LF22E		DW $0EC3           	; 'code field' - docolon
 		DW $F140		; CAT-HEADER
 		DW $F1D3		;
 		DW $F205		;
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -604,7 +603,7 @@ LF249		DW $0EC3           	; 'code field' - docolon
 		DW $FFE7		; back to ???
 		DW $0879		; DROP
 		DW $0E36		; OR
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -654,7 +653,7 @@ LF2A0		DW $0EC3            	; 'code field' - docolon
 
 LF2A2		DW $F28E		;
 		DW $F22E		; LOAD-CAT
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -781,8 +780,8 @@ Dloadl1         LD ($2325),SP               ; Transfer SP to HL.
                 SBC HL,DE                   ; Compare.
 
                 POP DE
-                LD A,$F                     ; "Not enough RAM".
-                CALL C,Error-?              ; Error if DE was > HL.
+                LD A,$0F                    ; "Not enough RAM".
+                CALL C,Error_Msg            ; Error if DE was > HL.
 
                 LD HL,(STKBOT)              ; First free byte after dict.
                 PUSH DE
@@ -1344,8 +1343,8 @@ Trk001p         IN A,(Pia_a_i)          ; Input lines
 ; * Saves the cat to disk.
 ; * No args or results.
 
-; * Calls Track00,Dictsize,Save_block,Step_out.
-; * Called by: STORE,RESTORE,BSTORE,XFORMAT and DELETE.
+; * Calls Track00, Dictsize, Save_block and Step_out.
+; * Called by: STORE, RESTORE, BSTORE, XFORMAT and DELETE.
 
             CALL Track00
             CALL Dictsize
@@ -1366,7 +1365,7 @@ Trk001p         IN A,(Pia_a_i)          ; Input lines
 
 ; * Calls: On,TrackOO,Dictsize, Load_block, Step_out,Print,
 ; *        Print_error and Error_Msg
-; * Called by: STQRE/RESTORE,BSTORE,LD,BLD,CAT and DELETE.
+; * Called by: STQRE/RESTORE, BSTORE, LD, BLD, CAT and DELETE.
 
               CALL On
               CALL Track00
@@ -1886,7 +1885,6 @@ Namepr          INC HL
                 DJNZ Namepr         ; Print rest of name.
 
                 ; Pad with spaces to get to the same column.
-
                 LD A,C
                 AND $1F             ; File name might have been
                                     ; longer than a line.
@@ -1897,7 +1895,6 @@ Catpdlp         LD A,$20            ; ASCII for space " ".
                 DJNZ Catpdlp
 
                 ; Print length in hex.
-
                 INC HL
                 LD C,(HL)
                 INC HL
@@ -1908,12 +1905,10 @@ Catpdlp         LD A,$20            ; ASCII for space " ".
                 CALL Hex_byte
 
                 ; Print space.
-
                 LD A,$20            ; ASCII for space " ".
                 RST 8               ; Wrch.
 
                 ; Print start address in hex of "DICT".
-
                 INC HL
                 LD C, (HL)
                 INC HL
@@ -2044,7 +2039,7 @@ Notfree         DJNZ Freelp         ; Try all tracks.
                 LD C,A
 
                 OR A                    ; Test for word not found.
-                LD A,8                  ; "File name not found".
+                LD A,$08                ; "File name not found".
                 CALL Z,Error_Msg
 
                 PUSH DE
@@ -2158,7 +2153,7 @@ Delfl3          INC HL                  ; Copy one name and data.
 
 ; * No arguments or results.
 
-; * Calls; Save_file,Save_cat and Off.
+; * Calls; Save_file, Save_cat and Off.
 
                 CALL Fill_length
                 LD HL,(STKBOT)          ; End of dict.
@@ -2175,7 +2170,7 @@ Delfl3          INC HL                  ; Copy one name and data.
                 LD A,E                  ; Is there anything to save.
                 SUB 2                   ; Two bytes added even if nothing.
                 OR D
-                LD A,$D                 ; "Why save 0 bytes?".
+                LD A,$0D                 ; "Why save 0 bytes?".
                 CALL Z,Error_Msg
 
                 PUSH HL
@@ -2218,7 +2213,7 @@ Delfl3          INC HL                  ; Copy one name and data.
 
 ; * No arguments or results.
 
-; * Calls; Load_cat,Save_file,Save_cat and Off.
+; * Calls; Load_cat, Save_file, Save_cat and Off.
 
                 CALL Word
                 CALL Load_cat
@@ -2231,7 +2226,7 @@ Delfl3          INC HL                  ; Copy one name and data.
 
                 LD A,D                  ; Test len = 0.
                 OR E
-                LD A,$D                 ; "Why save 0 bytes?".
+                LD A,$0D                ; "Why save 0 bytes?".
                 CALL Z,Error_Msg
 
                 CALL Enter_word
@@ -2317,8 +2312,8 @@ Bldlb           POP HL
                                         ; WORD uses this character
                                         ; as its termination mark.
                 CALL Enter_forth	; Under address 0FDC7h: CD B9 04 - 01/06/2020
-                dw WORD			; Under address:0FDCAh:	AB 05 - 01/06/2020
-                dw End_forth		; Under address:0FDCEh:	OE 1A - 01/06/2020
+                DW ROM_WORD		; Under address:0FDCAh:	AB 05 - 01/06/2020
+                DW End_forth		; Under address:0FDCEh:	OE 1A - 01/06/2020
                 RST 24                  ; Discard the top e.,f the stack
                                         ; which is the address of the pad.
                 RET
@@ -2559,7 +2554,7 @@ LFF52		DW $1011		; Stack next word
 		DW $1011		; Stack next word
 		DW $0028		; Init. routine from ACE ROM
 		DW $FFB5		; XFORMAT
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***                                                   ***
@@ -2586,7 +2581,7 @@ LFF67		DW $FF8E		; SCRATCH
 		DW $08B3		; @
 		DW $0E09		; 1+
 		DW $069A		; EXECUTE
-		DW $04B6		; Exit
+		DW Exit			; Exit
 
 ; *********************************************************
 ; ***                                                   ***
