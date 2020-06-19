@@ -157,7 +157,7 @@ DICT            EQU  $3C39	;
 LF000	  	DM "D"			; 'name field'
         	DB '.' + $80		; last charater inverted
 
-LF002        	DW $0011            	; ???
+LF002        	DW $0011            	; 'word lenght field'
 
 LF004	  	DW $0000		; 'link field' - end of linked list
 
@@ -183,7 +183,7 @@ LF009		DW $098D		; <#
 LF013	  	DM "E"			; 'name field'
         	DB '.' + $80		; last charater inverted
 
-LF015        	DW $001F            	; ???
+LF015        	DW $001F            	; 'word lenght field'
 
 LF017	  	DW $F006		; 'link field' to 'name leght field' of
 					; D. word
@@ -217,7 +217,7 @@ LF01C		DW $1011		; Stack next word
 LF034	  	DM "RAMTO"		; 'name field'
         	DB 'P' + $80		; last charater inverted
 
-        	DW $000F		; ???
+        	DW $000F		; 'word lenght field'
 
 LF03C	  	DW $F019     		; 'link field' to 'name leght field' of
 					; E. word
@@ -243,7 +243,7 @@ LF041		DW $1011		; Stack next word
 LF049	  	DM "START-OF-NAME"	; 'name field'
         	DB 'S' + $80		; last charater inverted
 
-        	DW $0015		; ???
+        	DW $0015		; 'word lenght field'
 
 LF059	  	DW $F03E     		; 'link field' to 'name leght field' of
 					; RAMTOP word
@@ -272,7 +272,7 @@ LF05E		DW $F03F		; ???
 LF06C	  	DM "FIND-FRE"		; 'name field'
         	DB 'E' + $80		; last charater inverted
 
-        	DW $0033		; ???
+        	DW $0033		; 'word lenght field'
 
 LF077	  	DW $F05B     		; 'link field' to 'name leght field' of
 					; START-OF-NAMES word
@@ -316,7 +316,7 @@ LF07C		DW $1011		; Stack next word
 LF0A8	  	DM "CAT-SINGLE-FIL"	; 'name field'
         	DB 'E' + $80		; last charater inverted
 
-        	DW $0033		; ???
+        	DW $004E		; 'word lenght field'
 
 LF0B9	  	DW $F079     		; 'link field' to 'name leght field' of
 					; FIND-FREE word
@@ -351,7 +351,7 @@ LF0BE		DW $0912		; OVER
 LF105	  	DM "TEST-PAG"		; 'name field'
         	DB 'E' + $80		; last charater inverted
 
-        	DW $0023		; ???
+        	DW $0023		; 'word lenght field'
 
 LF110	  	DW $F0BB     		; 'link field' to 'name leght field' of
 					; CAT-SINGLE-FILE word
