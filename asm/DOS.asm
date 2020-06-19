@@ -366,15 +366,13 @@ LF115		DW $0E1F		; 1-
 		DW $086B		; DUP
 		DW $0C1A		; 0=
 		DW $1283		; ?branch       - forward if not a
- 		DW $1112		; DUP
+ 		DW $1112		; DUP (the same as $086B)
 LF11E ???	DW $9F00
 ;???
 
 ; to be completed
 
 LF12F		DW $04B6		; Exit
-
-; to be completed
 
 ; *********************************************************
 ; ***	                                                ***
@@ -398,11 +396,36 @@ LF13F		DB $0A			; 'name length field'
 LF140	  	DW $0EC3            	; 'code field' - docolon
 
 		DW $0A1D		; CLS
-		DW $1396		; pr_embedded string
-
-; to be completed
-
-LF1B3		DW $04B6		; Exit
+		DW $1396		; Print embedded string (ROM routine)
+		DW $0008		; 8 characters in string
+LF148		DM "Drive : "		;
+		DW $F249		; DRIVE-NUMBER
+		DW $09D0		; U.
+		DW $0A95		; CR
+		DW $1396		; Print embedded string (ROM routine)
+		DW $0008		; 8 charatects in string
+LF15A		DM "Format: "		;
+		DW $F03F		; RAMTOP
+		DW $0E09		; 1+
+		DW $0896		; C@            - fetch content byte
+		DW $09D0		; U.
+		DW $1396		; Print embedded string (ROM routine)
+		DW $000A		; 10 characters in string
+LF16E		DM "tracks of "		;
+		DW $F03F		; RAMTOP
+		DW $0E13		; 2+
+		DW $09D0		; U.
+		DW $1396		; Print embedded string (ROM routine)
+		DW $0005		; 5 characters in string
+LF184		DM "bytes"		;
+		DW $0A95		; CR
+		DW $0A95		; CR
+		DW $1396		; Print embedded string (ROM routine)
+		DW $001E		; 30 characters in string
+LF191		DM "File name        Length   Type"
+ 		DB $0A95		; CR
+		DB $0A95		; CR
+		DW $04B6		; Exit
 
 ; $F1B5 - $F1C4 - 26 bytes of $FF
 
@@ -413,12 +436,37 @@ LF1B3		DW $04B6		; Exit
 ; *********************************************************
 ; * It is a FORTH word.
 
-; to be completed
+; Word to ...
 
-LF1C5
+LF1C5		DM "CAT-FILE"		; 'name field'
+	       	DB 'S' + $80		; last charater inverted
 
-; to be completed
+	       	DW $002B		; 'word lenght field'
 
+LF1D0	  	DW $F13F     		; 'link field' to 'name leght field' of
+				       	; CAT-HEADER word
+
+LF1D2		DB $09			; 'name length field'
+
+LF1D3	  	DW $0EC3            	; 'code field' - docolon
+
+		DW $1011		; Stack next word
+		DW $000F
+		DW $F05C		; START-OF-NAMES
+		DW $129F		; Forth (ROM routine)
+		DW $086B		; DUP
+		DW $0896		; C@            - fetch content byte
+		DW $08EE		; ?DUP          - duplicate if found
+		DW $1288		; ?branch (ROM routine)
+		DW $000D		; ???
+		DW $F0BC		; CAT-SINGLE-FILE
+		DW $0885		; SWAP
+		DW $F113		; TEST-PAGE
+		DW $0885		; SWAP
+		DW $1276		; Branch (ROM routine)
+		DW $FFEB		; ???
+		DW $0879		; DROP
+		DW $0879		; DROP
 LF1F7		DW $04B6		; Exit
 
 ; *********************************************************
@@ -428,11 +476,28 @@ LF1F7		DW $04B6		; Exit
 ; *********************************************************
 ; * It is a FORTH word.
 
-; to be completed
+; Word to ...
 
-LF1F9
+LF1F9		DM "CAT-EN"		; 'name field'
+	       	DB 'D' + $80		; last charater inverted
 
-; to be completed
+	       	DW $002B		; 'word lenght field'
+
+LF202	  	DW $F1D2    		; 'link field' to 'name leght field' of
+				       	; CAT-FILES word
+
+LF204		DB $07			; 'name length field'
+
+LF205	  	DW $0EC3            	; 'code field' - docolon
+
+		DW $0A95		; CR
+		DW $F07A		; FIND-FREE
+		DW $F007		; D.
+		DW $1396		; Print embedded string (ROM routine)
+		DW $000B		; 11 characters in string
+LF211		DM " bytes free"	;
+		DW $0A95		; CR
+		DW $04B6		; Exit
 
 ; *********************************************************
 ; ***	                                                ***
@@ -446,7 +511,7 @@ LF1F9
 LF220	  	DM "PRINT-CA"		; 'name field'
         	DB 'T' + $80		; last charater inverted
 
-LF229        	DW $000F            	; ????
+LF229        	DW $000F            	; 'word lenght field'
 
 LF22B	  	DW $F204		; 'link field' to 'name leght field' of
 					; CAT-END word
@@ -594,7 +659,7 @@ Fill_length     JP $FDF0          ; $F878
 ; *********************************************************
 ; * It is a Forth word.
 
-; * Loads a dict or bytes (At stored address) file from
+; * Loads a dict or bytes (at stored address) file from
 ; * disk to RAM.
 
 ; * No args or results.
