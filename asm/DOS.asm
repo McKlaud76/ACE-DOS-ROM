@@ -96,6 +96,20 @@
 
 ; *********************************************************
 ; ***                                                   ***
+; ***               Definition                          ***
+; ***                                                   ***
+; *********************************************************
+
+; * Compiler directives definition (if needed)
+
+; #define 	DB  .BYTE
+; #define 	DW  .WORD
+; #define 	DM  .TEXT
+; #define	EQU .EQU
+; #define	ORG .ORG
+
+; *********************************************************
+; ***                                                   ***
 ; ***               Constants                           ***
 ; ***                                                   ***
 ; *********************************************************
@@ -743,7 +757,7 @@ Fill_length     JP $FDF0          ; $F878
 ; * Calls: Word, Load-cat, Lookup-word, Load-file, Off
 ; *        and the Forth ROM for LOAD.
 
-                CALL Fill-length
+		CALL Fill-length
                 CALL Word
                 CALL Load-cat
                 CALL Lookup-word            ; HL := start address,
@@ -815,7 +829,7 @@ Dloadl1         LD ($2325),SP               ; Transfer SP to HL.
 
 ; * Calls: None.
 
-                LD HL,$3C4C                 ; Forth.
+		LD HL,$3C4C                 ; Forth.
                 LD ($3C31),HL               ; CURRENT.
                 LD ($3C33),HL               ; CONTEXT.
                 LD L,$4F
@@ -1988,9 +2002,9 @@ Notfree         DJNZ Freelp         ; Try all tracks.
 ; Calls: none.
 ; Called by: Load_cat and Save_cat.
 
-                LD HL,(RAMTOP)
+       		LD HL,(RAMTOP)
                 INC HL              ; Miss the byte used for DRIVE.
-                LD DE,(Cat_size)     ; Cat size.
+                LD DE,(Cat_size)    ; Cat size.
                 DEC DE              ; Don't save drive number.
                 RET
 
@@ -2008,7 +2022,7 @@ Notfree         DJNZ Freelp         ; Try all tracks.
 ; * Calls: None.
 ; * Called by: Load_file, Save_file.
 
-                PUSH HL             ; HL must be the same at the end.
+		PUSH HL             ; HL must be the same at the end.
                 LD HL,(RAMTOP)
                 INC HL
                 INC HL              ; The block length is in the second
@@ -2032,7 +2046,7 @@ Notfree         DJNZ Freelp         ; Try all tracks.
 ; * Calls: Find_word.
 ; * Called by: DELETE and RESTORE.
 
-                CALL Find_word          ; DE := data field of word,
+		CALL Find_word          ; DE := data field of word,
                                         ; HL := name length field,
                                         ; C := file number.
 
@@ -2119,7 +2133,7 @@ Delfl3          INC HL                  ; Copy one name and data.
 
 ; *********************************************************
 ; ***                                                   ***
-; ***               Error_Msg                             ***
+; ***               Error_Msg                           ***
 ; ***                                                   ***
 ; *********************************************************
 
@@ -2131,7 +2145,7 @@ Delfl3          INC HL                  ; Copy one name and data.
 ; * Calls: Print_error and Off.
 ; * Called by: Almost everything.
 
-                OR A                ; Test A=0
+		OR A                ; Test A=0
                 RET Z               ; Return if it is.
 
                 CALL Print_error
@@ -2259,7 +2273,7 @@ Delfl3          INC HL                  ; Copy one name and data.
 
                 LD A,H                  ; Check not DICT.
                 OR L
-                LD A,$B                 ; Error: "BLD a dict".
+                LD A,$0B                ; Error: "BLD a dict".
                 CALL Z,Error_Msg
 
                 EX HL,(SP)              ; HL = parameter start.
