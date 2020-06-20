@@ -178,7 +178,7 @@ DICT            EQU  $3C39	; The address of the length field in the
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF000	  	DM "D"			; 'name field'
         	DB '.' + $80		; last charater inverted
@@ -204,14 +204,14 @@ LF009		DW $098D		; <#
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF013	  	DM "E"			; 'name field'
         	DB '.' + $80		; last charater inverted
 
 LF015        	DW $001F            	; 'word lenght field'
 
-LF017	  	DW $F006		; 'link field' to 'name leght field' of
+LF017	  	DW LF006		; 'link field' to 'name leght field' of
 					; D. word
 
 LF019		DB $02			; 'name length field'
@@ -219,7 +219,7 @@ LF019		DB $02			; 'name length field'
 LF01A	  	DW $0EC3            	; 'code field' - docolon
 
 LF01C		DW $1011		; Stack next word
-		DW $0000		; EXWRCH
+		DW $0000		; ???
 		DW $098D		; <#
 		DW $09E1		; #S
 		DW $099C		; #>
@@ -238,14 +238,14 @@ LF01C		DW $1011		; Stack next word
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF034	  	DM "RAMTO"		; 'name field'
         	DB 'P' + $80		; last charater inverted
 
         	DW $000F		; 'word lenght field'
 
-LF03C	  	DW $F019     		; 'link field' to 'name leght field' of
+LF03C	  	DW LF019     		; 'link field' to 'name leght field' of
 					; E. word
 
 LF03E		DB $06			; 'name length field'
@@ -264,14 +264,14 @@ LF041		DW $1011		; Stack next word
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF049	  	DM "START-OF-NAME"	; 'name field'
         	DB 'S' + $80		; last charater inverted
 
         	DW $0015		; 'word lenght field'
 
-LF059	  	DW $F03E     		; 'link field' to 'name leght field' of
+LF059	  	DW LF03E     		; 'link field' to 'name leght field' of
 					; RAMTOP word
 
 LF05B		DB $0E			; 'name length field'
@@ -293,14 +293,14 @@ LF05E		DW $F03F		; ???
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF06C	  	DM "FIND-FRE"		; 'name field'
         	DB 'E' + $80		; last charater inverted
 
         	DW $0033		; 'word lenght field'
 
-LF077	  	DW $F05B     		; 'link field' to 'name leght field' of
+LF077	  	DW LF05B     		; 'link field' to 'name leght field' of
 					; START-OF-NAMES word
 
 LF079		DB $09			; 'name length field'
@@ -337,14 +337,14 @@ LF07C		DW $1011		; Stack next word
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF0A8	  	DM "CAT-SINGLE-FIL"	; 'name field'
         	DB 'E' + $80		; last charater inverted
 
         	DW $004E		; 'word lenght field'
 
-LF0B9	  	DW $F079     		; 'link field' to 'name leght field' of
+LF0B9	  	DW LF079     		; 'link field' to 'name leght field' of
 					; FIND-FREE word
 
 LF0BB		DB $0F			; 'name length field'
@@ -391,14 +391,14 @@ LF0F6		DM "   dict"
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF105	  	DM "TEST-PAG"		; 'name field'
         	DB 'E' + $80		; last charater inverted
 
         	DW $0023		; 'word lenght field'
 
-LF110	  	DW $F0BB     		; 'link field' to 'name leght field' of
+LF110	  	DW LF0BB     		; 'link field' to 'name leght field' of
 					; CAT-SINGLE-FILE word
 
 LF112		DB $09			; 'name length field'
@@ -427,14 +427,14 @@ LF115		DW $0E1F		; 1-
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF131	  	DM "CAT-HEADE"		; 'name field'
         	DB 'R' + $80		; last charater inverted
 
         	DW $007A		; 'word lenght field'
 
-LF13D	  	DW $F112     		; 'link field' to 'name leght field' of
+LF13D	  	DW LF112     		; 'link field' to 'name leght field' of
 					; TEST-PAGE word
 
 LF13F		DB $0A			; 'name length field'
@@ -482,14 +482,14 @@ LF191		DM "File name        Length   Type"
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF1C5		DM "CAT-FILE"		; 'name field'
 	       	DB 'S' + $80		; last charater inverted
 
 	       	DW $002B		; 'word lenght field'
 
-LF1D0	  	DW $F13F     		; 'link field' to 'name leght field' of
+LF1D0	  	DW LF13F     		; 'link field' to 'name leght field' of
 				       	; CAT-HEADER word
 
 LF1D2		DB $09			; 'name length field'
@@ -522,14 +522,14 @@ LF1D3	  	DW $0EC3            	; 'code field' - docolon
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF1F9		DM "CAT-EN"		; 'name field'
 	       	DB 'D' + $80		; last charater inverted
 
 	       	DW $002B		; 'word lenght field'
 
-LF202	  	DW $F1D2    		; 'link field' to 'name leght field' of
+LF202	  	DW LF1D2    		; 'link field' to 'name leght field' of
 				       	; CAT-FILES word
 
 LF204		DB $07			; 'name length field'
@@ -552,14 +552,14 @@ LF211		DM " bytes free"	;
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF220	  	DM "PRINT-CA"		; 'name field'
         	DB 'T' + $80		; last charater inverted
 
 LF229        	DW $000F            	; 'word lenght field'
 
-LF22B	  	DW $F204		; 'link field' to 'name leght field' of
+LF22B	  	DW LF204		; 'link field' to 'name leght field' of
 					; CAT-END word
 
 LF22D		DB $09			; 'name length field'
@@ -578,14 +578,14 @@ LF22E		DW $0EC3           	; 'code field' - docolon
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF220	  	DM "DRIVE-NUMBE"	; 'name field'
         	DB 'R' + $80		; last charater inverted
 
 LF244        	DW $003D            	; 'word lenght field'
 
-LF246	  	DW $F22D		; 'link field' to 'name leght field' of
+LF246	  	DW LF22D		; 'link field' to 'name leght field' of
 					; PRINT-CAT word
 
 LF248		DB $0C			; 'name length field'
@@ -626,14 +626,15 @@ LF249		DW $0EC3           	; 'code field' - docolon
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF281	  	DM "LOAD-CA"		; 'name field'
         	DB 'T' + $80		; last charater inverted
 
-LF289        	DW $0000            	; ????
+LF289        	DW $0000            	; ??? 'word lenght field'
+					; Shout it be: $000E ??? - 1/06/2020
 
-LF28B	  	DW $F248		; 'link field' to 'name leght field' of
+LF28B	  	DW LF248		; 'link field' to 'name leght field' of
 					; DRIVE word
 
 LF28D		DB $08			; 'name length field'
@@ -651,14 +652,15 @@ LF290		CALL Load_cat		; Load_cat
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF298	  	DM "DI"			; 'name field'
         	DB 'R' + $80		; last charater inverted
 
-LF29B        	DW $0000            	; ????
+LF29B        	DW $0000            	; ??? 'word lenght field'
+					; Shout it be: $000D ??? - 1/06/2020
 
-LF29D	  	DW $F28D		; 'link field' to 'name leght field' of
+LF29D	  	DW LF28D		; 'link field' to 'name leght field' of
 					; LOAD-CAT word
 
 LF29F		DB $03			; 'name length field'
@@ -676,17 +678,20 @@ LF2A2		DW $F28E		;
 ; *********************************************************
 ; * It is a FORTH word.
 
-; Word to ...
+; * Word to ...
 
 LF2A8	  	DM "CP"			; 'name field'
         	DB 'Y' + $80		; last charater inverted
 
-LF2AB        	DW $0000            	; ????
+LF2AB        	DW $0000            	; ??? 'word lenght field'
+					; Shout it be: xxx ??? - 1/06/2020
 
-LF2AD	  	DW $F29F		; 'link field' to 'name leght field' of
+LF2AD	  	DW LF29F		; 'link field' to 'name leght field' of
 					; DIR word
 
 LF2AF		DB $03			; 'name length field'
+
+; CPY is not complete, 'code field' and code is missing - 1/06/2020
 
 ; $72B0 - $F7FF: 1360 bytes of $FF
 
@@ -2556,7 +2561,7 @@ LFF45	  	DM "FORMA"		; 'name field'
 
 LFF4B        	DW $0013            	; 'word lenght field'
 
-LFF4D	  	DW $F2AF		; 'link field' to 'name leght field' of
+LFF4D	  	DW LF2AF		; 'link field' to 'name leght field' of
 					; CPY word
 
 LFF4F		DB $06			; 'name length field'
@@ -2581,7 +2586,7 @@ LFF5E	  	DM "RU"			; 'name field'
 
 LFF61        	DW $0017            	; 'word lenght field'
 
-LFF63	  	DW $FF4F		; 'link field' to 'name leght field' of
+LFF63	  	DW LFF4F		; 'link field' to 'name leght field' of
 					; FORMAT word
 
 LFF65		DB $03			; 'name length field'
@@ -2608,7 +2613,7 @@ LFF78	  	DM "MA"			; 'name field'
 
 LFF7B        	DW $0007            	; 'word lenght field'
 
-LFF7D	  	DW $FF65		; 'link field' to 'name leght field' of
+LFF7D	  	DW LFF65		; 'link field' to 'name leght field' of
 					; RUN word
 
 LFF7F		DB $03			; 'name length field'
@@ -2627,7 +2632,7 @@ LFF82	  	DM "SCRATC"		; 'name field'
 
 LFF89        	DW $0007            	; 'word lenght field'
 
-LFF8B	  	DW $FF7F		; 'link field' to 'name leght field' of
+LFF8B	  	DW LFF7F		; 'link field' to 'name leght field' of
 					; MAP word
 
 LFF8D		DB $07			; 'name length field'
@@ -2646,7 +2651,7 @@ LFF90	  	DM "RESAV"		; 'name field'
 
 LFF96        	DW $0007            	; 'word lenght field'
 
-LFF98	  	DW $FF8D		; 'link field' to 'name leght field' of
+LFF98	  	DW LFF8D		; 'link field' to 'name leght field' of
 					; SCRATCH word
 
 LFF9A		DB $06			; 'name length field'
@@ -2665,7 +2670,7 @@ LFF9D	  	DM "DRIV"		; 'name field'
 
 LFFA2        	DW $0007            	; 'word lenght field'
 
-LFFA4	  	DW $FF9A		; 'link field' to 'name leght field' of
+LFFA4	  	DW LFF9A		; 'link field' to 'name leght field' of
 					; RESAVE word
 
 LFFA6		DB $05			; 'name length field'
@@ -2684,7 +2689,7 @@ LFFA9	  	DM "XFORMA"		; 'name field'
 
 LFFB0        	DW $0007            	; 'word lenght field'
 
-LFFB2	  	DW $FFA6		; 'link field' to 'name leght field' of
+LFFB2	  	DW LFFA6		; 'link field' to 'name leght field' of
 					; DRIVE word
 
 LFFB4		DB $07			; 'name length field'
@@ -2703,7 +2708,7 @@ LFFB7	  	DM "CA"			; 'name field'
 
 LFFBA        	DW $0007            	; 'word lenght field'
 
-LFFBC	  	DW $FFB4		; 'link field' to 'name leght field' of
+LFFBC	  	DW LFFB4		; 'link field' to 'name leght field' of
 					; XFORMAT word
 
 LFFBE		DB $03			; 'name length field'
@@ -2722,7 +2727,7 @@ LFFC1	  	DM "DELET"		; 'name field'
 
 LFFC7        	DW $0007            	; 'word lenght field'
 
-LFFC9	  	DW $FFBE		; 'link field' to 'name leght field' of
+LFFC9	  	DW LFFBE		; 'link field' to 'name leght field' of
 					; CAT word
 
 LFFCB		DB $06			; 'name length field'
@@ -2739,9 +2744,10 @@ LFFCC	  	DW $F854            	; “code field” address of machine code
 LFFCE	  	DM "DBSAV"		; 'name field'
         	DB 'E' + $80		; last charater inverted
 
-LFFD4        	DW $FFFF            	; ???
+LFFD4        	DW $FFFF            	; ??? 'word lenght field'
+					; Should it be: $0007 ??? - 1/06/2020
 
-LFFD6	  	DW $FFCB		; 'link field' to 'name leght field' of
+LFFD6	  	DW LFFCB		; 'link field' to 'name leght field' of
 					;  DELETE word
 
 LFFD8		DB $06			; 'name length field'
@@ -2760,7 +2766,7 @@ LFFDB	  	DM "DSAV"		; 'name field'
 
 LFFE0        	DW $0007            	; 'word lenght field'
 
-LFFE2	  	DW $FFD8		; 'link field' to 'name leght field' of
+LFFE2	  	DW LFFD8		; 'link field' to 'name leght field' of
 					;  DBSAVE word
 
 LFFE4		DB $05			; 'name length field'
@@ -2779,7 +2785,7 @@ LFFE7	  	DM "DBLOA"		; 'name field'
 
 LFFED        	DW $0007            	; 'word lenght field'
 
-LFFEF	  	DW $FFE4		; 'link field' to 'name leght field' of
+LFFEF	  	DW LFFE4		; 'link field' to 'name leght field' of
 					;  DSAVE word
 
 LFFF1		DB $06			; 'name length field'
@@ -2796,9 +2802,10 @@ LFFF2	  	DW $F863            	; “code field” address of machine code
 LFFF4	  	DM "DLOA"		; 'name field'
         	DB 'D' + $80		; last charater inverted
 
-LFFF9        	DW $3C47            	; ???
+LFFF9        	DW $3C47            	; ??? 'word lenght field'
+					; Should it be: $0007 ??? - 1/06/2020
 
-LFFFB	  	DW $FFF1		; 'link field' to 'name leght field' of
+LFFFB	  	DW LFFF1		; 'link field' to 'name leght field' of
 					;  DBLOAD word
 
 LFFFD		DB $05			; 'name length field'
