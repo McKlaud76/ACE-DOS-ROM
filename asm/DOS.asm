@@ -632,7 +632,7 @@ LF281	  	DM "LOAD-CA"		; 'name field'
         	DB 'T' + $80		; last charater inverted
 
 LF289        	DW $0000            	; ??? 'word lenght field'
-					; Shout it be: $000E ??? - 1/06/2020
+					; Should it be: $000E ??? - 1/06/2020
 
 LF28B	  	DW LF248		; 'link field' to 'name leght field' of
 					; DRIVE word
@@ -658,7 +658,7 @@ LF298	  	DM "DI"			; 'name field'
         	DB 'R' + $80		; last charater inverted
 
 LF29B        	DW $0000            	; ??? 'word lenght field'
-					; Shout it be: $000D ??? - 1/06/2020
+					; Should it be: $000D ??? - 1/06/2020
 
 LF29D	  	DW LF28D		; 'link field' to 'name leght field' of
 					; LOAD-CAT word
@@ -667,8 +667,8 @@ LF29F		DB $03			; 'name length field'
 
 LF2A0		DW $0EC3            	; 'code field' - docolon
 
-LF2A2		DW $F28E		;
-		DW $F22E		; LOAD-CAT
+LF2A2		DW $F28E		; LOAD-CAT
+		DW $F22E		; PRINT-CAT
 		DW Exit			; Exit
 
 ; *********************************************************
@@ -684,7 +684,7 @@ LF2A8	  	DM "CP"			; 'name field'
         	DB 'Y' + $80		; last charater inverted
 
 LF2AB        	DW $0000            	; ??? 'word lenght field'
-					; Shout it be: xxx ??? - 1/06/2020
+					; Should it be: xxx ??? - 1/06/2020
 
 LF2AD	  	DW LF29F		; 'link field' to 'name leght field' of
 					; DIR word
