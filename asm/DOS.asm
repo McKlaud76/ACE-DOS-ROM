@@ -278,7 +278,7 @@ LF05B		DB $0E			; 'name length field'
 
 LF05C	  	DW $0EC3            	; 'code field' - docolon
 
-LF05E		DW $F03F		; ???
+LF05E		DW $F03F		; RAMTOP
 		DW $0E09		; 1+
 		DW $086B		; DUP
 		DW $0896		; C@            - fetch content byte
@@ -324,7 +324,7 @@ LF07C		DW $1011		; Stack next word
 		DW $12A4		; ?end
 		DW $1332		; shuffle (ROM routine)
 		DW $FFEF		; DBLOAD
-		DW $0F3F		; ???
+		DW $F03F		; RAMTOP
 		DW $0E13		; 2+
 		DW $08B3		; @
 		DW $0CA8		; U*
@@ -360,7 +360,7 @@ LF0BE		DW $0912		; OVER
 		DW $0912		; OVER
 		DW $0DE1		; -
 		DW $1011		; Stack next word
-		DW $001F
+		DW $001F		;
 		DW $0E4B		; AND
 		DW $0A83		; SPACES
 		DW $0DD2		; +
@@ -375,7 +375,7 @@ LF0BE		DW $0912		; OVER
 		DW $0007		; to ???
 		DW $F01A		; E.
 		DW $1271		; Branch
-		DW $000E
+		DW $000E		;
 		DW $1396		; Print embedded string (ROM routine)
 		DW $0007		; 7 characters in string
 LF0F6		DM "   dict"
@@ -413,7 +413,7 @@ LF115		DW $0E1F		; 1-
 		DW $129F		; Forth
 		DW $0BDB		; INKEY
 		DW $128D		; ?branch
-		DW $FFFB		; ???
+		DW $FFFB		; DLOAD
 		DW $0879		; DROP
 		DW $1011		; Stack next word
 		DW $000F		; ???
@@ -497,7 +497,7 @@ LF1D2		DB $09			; 'name length field'
 LF1D3	  	DW $0EC3            	; 'code field' - docolon
 
 		DW $1011		; Stack next word
-		DW $000F
+		DW $000F		;
 		DW $F05C		; START-OF-NAMES
 		DW $129F		; Forth (ROM routine)
 		DW $086B		; DUP
@@ -567,8 +567,8 @@ LF22D		DB $09			; 'name length field'
 LF22E		DW $0EC3           	; 'code field' - docolon
 
 		DW $F140		; CAT-HEADER
-		DW $F1D3		;
-		DW $F205		;
+		DW $F1D3		; CAT-FILES
+		DW $F205		; CAT-END
 		DW Exit			; Exit
 
 ; *********************************************************
@@ -774,7 +774,7 @@ Fill_length     JP $FDF0          ; $F878
 
                 CALL Load-file              ; Load bytes file at address
                 CALL Off                    ; Read from cat.
-                JP (IY)
+                JP (IY)			    ; FORTH return.
 
 Dloadl1         LD ($2325),SP               ; Transfer SP to HL.
                 LD HL,($2325)
@@ -847,7 +847,7 @@ Dloadl1         LD ($2325),SP               ; Transfer SP to HL.
                 LD ($3C3B),HL               ; SPARE.
                 LD L,$49
                 LD ($3C4C),HL               ; Forth link - corrected from $3C49 - 01/06/2020
-                JP (IY)
+                JP (IY)			    ; FORTH return.
 
 ; *********************************************************
 ; ***                                                   ***
@@ -1104,7 +1104,7 @@ IntoffR     	EI
 ; *********************************************************
 
 ; * Waits a specified number of milli seconds.
-; * Depends on a Z-80 clock of 3.25 MHz.
+; * Depends on a Z80 clock of 3.25 MHz.
 
 ; * On entry, C is the time to be waited in ms.
 ; * BC,DE,HL and A are preserved.
@@ -1183,7 +1183,7 @@ Wait2       	DJNZ Wait2
             	LD BC,(Cat_size)        ; HL = top of detected RAM.
             	OR A                    ; Clear carry.
             	SBC HL, DE
-            	LD (RAMTOP),HL
+            	LD (RAMTOP),HL		; Set system variable RAMTOP.
             	LD SP, HL
             	LD (HL),$FD             ; Drive 0.
             	LD C,100                ; Wait 0.1s for PIA reset
@@ -1213,7 +1213,7 @@ Wait2       	DJNZ Wait2
             	OUT (Acia_control),A
 
             	LD A,B
-            	JP $32                  ; Resume startup.
+            	JP $0032                ; Resume startup (back to ACE ROM).
 
 ; *********************************************************
 ; ***                                                   ***
@@ -1266,7 +1266,6 @@ Wait2       	DJNZ Wait2
 ; * It selects drive and side.
 ; * Least significant bit of number on parameter stack
 ; * gives side, next two bits give drive number.
-
 
                 RST 24              ; Pop DE from parameter stack.
 
@@ -1498,7 +1497,6 @@ Erknown         LD A,B
 
 ; * Calls: Block_length,Step_out and Save_block.
 ; * Called by: STORE, BSTORE and RESTORE.
-
 
                 LD C,2              ; Offset from (RAMTOP)+l of byte
                                     ; below start of track file table.
@@ -1966,7 +1964,7 @@ Findfre         LD A,$0D            ; CR.
                 LD HL,0             ; Bytes free accumulated in HL
                 LD C,0              ; and C.
 
-Freelp          EX HL, (SP)         ; HL = vector pointer.
+Freelp          EX HL,(SP)          ; HL = vector pointer.
                 INC HL              ; Next track.
                 LD A,(HL)           ; File number of track.
                 EX HL,(SP)          ; HL = Count.
@@ -2135,7 +2133,6 @@ Delfl3          INC HL                  ; Copy one name and data.
                 CALL Off
                 JP (IY)             ; FORTH return.
 
-
 ; *********************************************************
 ; ***                                                   ***
 ; ***               Error_Msg                           ***
@@ -2218,7 +2215,7 @@ Delfl3          INC HL                  ; Copy one name and data.
                 CALL Word
                 CALL Load_cat
                 CALL Save
-                JP (IY)
+                JP (IY)			; FORTH return
 
 ; *********************************************************
 ; ***                                                   ***
@@ -2311,7 +2308,7 @@ Bldlb           POP HL
                 CALL Delete_file
                 CALL Save_cat
                 CALL Store
-                JP (IY)
+                JP (IY)			; FORTH return.
 
 ; *********************************************************
 ; ***                                                   ***
@@ -2546,7 +2543,6 @@ Text25		DM " bytes free "
 		DB $00				; Text separator
 
 ; * Message_space end
-
 
 ; *	2st Block of Words Definition starts at $FF45
 
