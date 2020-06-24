@@ -114,10 +114,10 @@
 ; ***                                                   ***
 ; *********************************************************
 
-Acia_status	EQU  $21        ; Acia status register
-Acia_in         EQU  $23        ; Acia data input register
-Acia_control    EQU  $01        ; Acia control register
-Acia_out        EQU  $03        ; Acia data output register
+Acia_status	EQU  $21        ; Acia status register		(0010 0001)
+Acia_in         EQU  $23        ; Acia data input register	(0010 0011)
+Acia_control    EQU  $01        ; Acia control register		(0000 0001)
+Acia_out        EQU  $03        ; Acia data output register	(0000 0011)
 
 Pia_a_i         EQU  $29        ; PIA port A data input 	(0010 1001)
 Pia_a_o         EQU  $09        ; PIA port A data output 	(0000 1001)
@@ -1199,7 +1199,7 @@ Wait2       	DJNZ Wait2
             	OUT (Pia_b_o),A         ; All lines output for port B.
             	LD A,%11111000          ; Three lines input for
             	OUT (Pia_a_o),A         ; port A.
-            	LD A,4                  ; Set both control registers
+            	LD A,$04                ; Set both control registers
             	OUT (Pia_a_cr),A        ; to allow access to
             	OUT (Pia_b_cr),A        ; data registers.
             	LD A,$FF                ; Set all outputs high (inactive).
@@ -1207,11 +1207,11 @@ Wait2       	DJNZ Wait2
             	OUT (Pia_b_o),A
 
             	; Initialise ACIA.
-            	LD A,3                  ; Reset ACIA.
+            	LD A,%11                ; Reset ACIA (CR1 & CR0 = 1).
             	OUT (Acia_control),A
-            	LD A,%11100             ; Set ACIA to 9-bit parity.
-            	OUT (Acia_control),A
-
+            	LD A,%11100             ; Set ACIA to 9-bit parity
+            	OUT (Acia_control),A	; 8 bits + Odd Parity + 1 Stop Bit
+					; (CR2, CR3 & CR3 = 1)
             	LD A,B
             	JP $0032                ; Resume startup (back to ACE ROM).
 
